@@ -1,28 +1,34 @@
-name: PR Date Format Check
+name: PR Date Format Reviewer
 
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read            # read repository files
+  pull-requests: write      # create reviews
+  issues: write             # add labels & assignees
 
 jobs:
-  check-date:
+  pr-date-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
 
       - name: Install dependencies
-        run: python -m pip install --upgrade pip PyYAML
+        run: pip install PyGithub pyyaml
 
       - name: Run PR date reviewer
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
-        run: |
-          python .github/scripts/pr_date_reviewer.py \
-            --event-path "$GITHUB_EVENT_PATH" \
-            --rule-file ".github/pr-rules/date_format.yml"
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python .github/scripts/pr_date_reviewer.py
