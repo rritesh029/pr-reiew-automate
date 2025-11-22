@@ -54,6 +54,7 @@ pull = repo.get_pull(pr_number)
 files = list(pull.get_files())
 violations = []
 
+# Make the candidate detector permissive (catch any Word D, YYYY)
 date_candidate_pattern = re.compile(r'\b([A-Za-z]+)\s+([0-9]{1,2}),\s+([0-9]{4})\b')
 
 # --- helper to compute line number ---
@@ -70,23 +71,23 @@ def find_line_number_in_full_content(content: str, token: str):
 def find_line_number_in_patch(patch: str, token: str):
     """
     Parse unified diff patch and return the 1-based line number in the new file where token first appears.
-    Strategy:
-      - parse hunk headers like "@@ -a,b +c,d @@"
-      - track current new-file line number (starts at c)
-      - iterate lines: ' ' and '+' increment new-file line number; '-' does not.
-      - when a '+' or ' ' line (i.e. present in new file) contains token, return current new-file line number.
+			 
+												 
+														
+																				
+																											  
     """
     if not patch:
         return None
     new_line_num = None
     for raw_line in patch.splitlines():
         if raw_line.startswith('@@'):
-            # parse hunk header
-            # example: @@ -1,3 +1,9 @@
+							   
+									  
             try:
                 header = raw_line
                 parts = header.split()
-                # parts[2] is like '+c,d' or '+c'
+												 
                 plus_part = next((p for p in parts if p.startswith('+')), None)
                 if plus_part:
                     plus_part = plus_part.lstrip('+')
@@ -105,7 +106,7 @@ def find_line_number_in_patch(patch: str, token: str):
             continue
 
         if raw_line.startswith('\\'):
-            # ignore "\ No newline at end of file"
+												  
             continue
 
         line_type = raw_line[:1]
@@ -115,12 +116,21 @@ def find_line_number_in_patch(patch: str, token: str):
         if token in content and line_type != '-':
             return new_line_num
 
-        # increment new-file line number for lines that are in the new file
+																		   
         if line_type in (' ', '+'):
             new_line_num += 1
-        # if '-', do not increment new_line_num
+											   
 
     return None
+
+# normalize token helper
+def normalize_token_for_matching(token: str) -> str:
+    t = token.strip()
+    t = t.replace('\u00A0', ' ')
+    # remove zero-width and directionality chars
+    t = re.sub(r'[\u200B\u200C\u200D\u200E\u200F]', '', t)
+    t = re.sub(r'\s+', ' ', t)
+    return t
 
 # iterate changed files
 for f in files:
@@ -164,28 +174,38 @@ for f in files:
         continue
 
     for match in date_candidate_pattern.finditer(raw):
-        token = match.group(0).strip()
-        if not allowed_regex.match(token):
-            # compute line number depending on whether we have full content or patch
+        token_orig = match.group(0).strip()
+        # normalize token before matching against allowed regex
+        token_norm = normalize_token_for_matching(token_orig)
+
+        # use fullmatch to ensure entire token matches pattern
+        is_allowed = bool(allowed_regex.fullmatch(token_norm))
+
+        if not is_allowed:
+            # compute line number: try to find the original token first, fallback to normalized token
             line_no = None
             try:
                 if is_full_content:
-                    line_no = find_line_number_in_full_content(raw, token)
+                    line_no = find_line_number_in_full_content(raw, token_orig)
+                    if line_no is None and token_norm != token_orig:
+                        line_no = find_line_number_in_full_content(raw, token_norm)
                 else:
-                    line_no = find_line_number_in_patch(raw, token)
+                    line_no = find_line_number_in_patch(raw, token_orig)
+                    if line_no is None and token_norm != token_orig:
+                        line_no = find_line_number_in_patch(raw, token_norm)
             except Exception as e:
-                print(f"Error computing line number for token {token} in {filename}: {e}")
+                print(f"Error computing line number for token {token_orig} in {filename}: {e}")
                 line_no = None
 
             violations.append({
                 "file": filename,
-                "bad_date": token,
+                "bad_date": token_orig,
                 "line": line_no
             })
             if line_no:
-                print(f"Violation in {filename}: {token} (line {line_no})")
+                print(f"Violation in {filename}: {token_orig} (line {line_no})")
             else:
-                print(f"Violation in {filename}: {token} (line unknown)")
+                print(f"Violation in {filename}: {token_orig} (line unknown)")
 
 # If violations exist -> create a review REQUEST_CHANGES + add label + assign PR author
 if violations:
