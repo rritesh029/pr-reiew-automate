@@ -72,8 +72,8 @@ for f in files:
     try:
     # Prefer to fetch from the PR head repository (handles forks)
     # 'pull' is the PyGithub PullRequest object created earlier.
-    head_repo_obj = pull.head.repo or repo  # pull.head.repo may be None in some edge-cases
-    head_ref = pull.head.ref  # branch name in head repo (e.g. "feature/branch")
+        head_repo_obj = pull.head.repo or repo  # pull.head.repo may be None in some edge-cases
+        head_ref = pull.head.ref  # branch name in head repo (e.g. "feature/branch")
 
     try:
         content_file = head_repo_obj.get_contents(filename, ref=head_ref)
