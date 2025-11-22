@@ -69,12 +69,26 @@ for f in files:
     print(f"Checking file: {filename}")
     # Fetch file content at PR head ref
     try:
-        content_file = repo.get_contents(filename, ref=pr.head.ref)
+    # Prefer to fetch from the PR head repository (handles forks)
+    # 'pull' is the PyGithub PullRequest object created earlier.
+    head_repo_obj = pull.head.repo or repo  # pull.head.repo may be None in some edge-cases
+    head_ref = pull.head.ref  # branch name in head repo (e.g. "feature/branch")
+
+    try:
+        content_file = head_repo_obj.get_contents(filename, ref=head_ref)
         raw = b64decode(content_file.content).decode("utf-8", errors="ignore")
+    except UnknownObjectException:
+        # If the file isn't present at the head ref (rare) try reading the patch from the PR file entry
+        # f is the file object from pull.get_files()
+        print(f"Could not fetch raw content for {filename} by get_contents; trying patch.")
+        raw = f.patch or ""
     except Exception as e:
-        # fallback: try to use raw patch or skip
-        print(f"Could not fetch content for {filename}: {e}")
-        continue
+        print(f"Failed to get_contents for {filename} from head repo {head_repo_obj.full_name}@{head_ref}: {e}")
+        # as fallback, try to use the file.patch, then skip if not available
+        raw = f.patch or ""
+except Exception as e:
+    print(f"Unexpected error fetching content for {filename}: {e}")
+    raw = ""
 
     # Find candidate date tokens and validate each token with allowed regex.
     # If token exists but doesn't match allowed_regex exactly, it's a violation.
