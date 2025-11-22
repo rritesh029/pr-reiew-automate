@@ -54,11 +54,7 @@ pull = repo.get_pull(pr_number)
 files = list(pull.get_files())
 violations = []
 
-date_candidate_pattern = re.compile(
-    r'\b('
-    r'January|February|March|April|May|June|July|August|September|October|November|December'
-    r')\s+([0-9]{1,2}),\s+([0-9]{4})\b'
-)
+date_candidate_pattern = re.compile(r'\b([A-Za-z]+)\s+([0-9]{1,2}),\s+([0-9]{4})\b')
 
 # --- helper to compute line number ---
 def find_line_number_in_full_content(content: str, token: str):
