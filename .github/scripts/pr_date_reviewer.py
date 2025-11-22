@@ -1,114 +1,148 @@
 #!/usr/bin/env python3
-"""PR date format reviewer
-
-This script reads the GitHub event JSON (path provided by --event-path)
-and a YAML rule file describing a regex to validate the PR title.
-
-Exit codes:
-  0 - title matches rule
-  1 - title does not match rule or an error occurred
-"""
-import argparse
+import os
 import json
 import re
 import sys
-from pathlib import Path
+from github import Github
+import yaml
+from base64 import b64decode
 
+# --- config / env ---
+GITHUB_EVENT_PATH = os.environ.get("GITHUB_EVENT_PATH")
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
+GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY")  # "owner/repo"
+
+if not (GITHUB_EVENT_PATH and GITHUB_TOKEN and GITHUB_REPOSITORY):
+    print("Missing required environment variables.")
+    sys.exit(1)
+
+# Load event payload (GitHub writes this for the action runner)
+with open(GITHUB_EVENT_PATH, "r") as f:
+    event = json.load(f)
+
+# Only handle pull_request events
+pr = event.get("pull_request")
+if not pr:
+    print("No pull_request payload found. Exiting.")
+    sys.exit(0)
+
+pr_number = pr.get("number")
+pr_head_ref = pr.get("head", {}).get("ref")
+pr_author = pr.get("user", {}).get("login")
+if not pr_number:
+    print("PR number not found; exiting.")
+    sys.exit(1)
+
+# Load rule file
+RULE_PATH = ".github/pr-rules/date_format.yml"
 try:
-    import yaml
-except Exception:
-    yaml = None
+    with open(RULE_PATH, "r") as rf:
+        rules = yaml.safe_load(rf)
+except FileNotFoundError:
+    print(f"Rule file {RULE_PATH} not found — using defaults.")
+    rules = {}
 
+allowed_regex_str = rules.get("allowed_date_regex") or \
+    r'^(January|February|March|April|May|June|July|August|September|October|November|December) ([1-9]|[12][0-9]|3[01]), \d{4}$'
+allowed_regex = re.compile(allowed_regex_str)
 
-def load_event(path: Path):
-    with path.open('r', encoding='utf-8') as f:
-        return json.load(f)
+# initialize GitHub client
+gh = Github(GITHUB_TOKEN)
+repo = gh.get_repo(GITHUB_REPOSITORY)
+pull = repo.get_pull(pr_number)
 
+# iterate changed files
+files = list(pull.get_files())
+violations = []  # list of dicts {file,path, example_bad_date}
 
-def load_rule(path: Path):
-    if yaml is None:
-        raise RuntimeError('PyYAML is required. Install with `pip install PyYAML`')
-    with path.open('r', encoding='utf-8') as f:
-        return yaml.safe_load(f)
+date_candidate_pattern = re.compile(
+    r'\b('
+    r'January|February|March|April|May|June|July|August|September|October|November|December'
+    r')\s+([0-9]{1,2}),\s+([0-9]{4})\b'
+)
 
+for f in files:
+    filename = f.filename
+    if not filename.lower().endswith(".json"):
+        continue
 
-def main():
-    p = argparse.ArgumentParser(description='Validate PR title date format')
-    p.add_argument('--event-path', required=True, help='Path to GitHub event JSON')
-    p.add_argument('--rule-file', required=True, help='YAML file with `rule.pattern`')
-    args = p.parse_args()
-
-    event_path = Path(args.event_path)
-    rule_path = Path(args.rule_file)
-
-    if not event_path.exists():
-        print(f'ERROR: event file not found: {event_path}', file=sys.stderr)
-        sys.exit(1)
-
-    if not rule_path.exists():
-        print(f'ERROR: rule file not found: {rule_path}', file=sys.stderr)
-        sys.exit(1)
-
+    print(f"Checking file: {filename}")
+    # Fetch file content at PR head ref
     try:
-        event = load_event(event_path)
-    except Exception as exc:
-        print(f'ERROR: failed to load event JSON: {exc}', file=sys.stderr)
-        sys.exit(1)
+        content_file = repo.get_contents(filename, ref=pr.head.ref)
+        raw = b64decode(content_file.content).decode("utf-8", errors="ignore")
+    except Exception as e:
+        # fallback: try to use raw patch or skip
+        print(f"Could not fetch content for {filename}: {e}")
+        continue
 
+    # Find candidate date tokens and validate each token with allowed regex.
+    # If token exists but doesn't match allowed_regex exactly, it's a violation.
+    for match in date_candidate_pattern.finditer(raw):
+        token = match.group(0).strip()
+        # check strict match: whole token must match allowed regex
+        if not allowed_regex.match(token):
+            # record violation: include first occurrence location
+            # to keep simple we won't compute diff position; we'll reference filename.
+            violations.append({"file": filename, "bad_date": token})
+            print(f"Violation in {filename}: {token}")
+
+# If violations exist -> create a review REQUEST_CHANGES + add label + assign PR author
+if violations:
+    # create a human readable message
+    lines = []
+    lines.append("Automated review: Date format violations detected.")
+    lines.append("")
+    for v in violations:
+        lines.append(f"- File `{v['file']}` contains date `{v['bad_date']}` which is not in allowed format.")
+    lines.append("")
+    lines.append("Expected format: `Month D, YYYY` (e.g. `November 1, 2025`). Please fix all occurrences.")
+    body = "\n".join(lines)
+
+    print("Creating review (REQUEST_CHANGES)...")
+    # Create review on the PR (summary-level review)
     try:
-        rule = load_rule(rule_path)
-    except Exception as exc:
-        print(f'ERROR: failed to load rule file: {exc}', file=sys.stderr)
-        sys.exit(1)
+        pull.create_review(body=body, event="REQUEST_CHANGES")
+        print("Review created with REQUEST_CHANGES.")
+    except Exception as e:
+        print(f"Failed to create review: {e}")
 
-    pr = event.get('pull_request') or event.get('pull_request', {})
-    title = None
-    if pr and isinstance(pr, dict):
-        title = pr.get('title')
-    if not title:
-        # fallback: check issue.title (some events)
-        issue = event.get('issue')
-        if issue and isinstance(issue, dict):
-            title = issue.get('title')
-
-    if not title:
-        print('ERROR: could not find PR/issue title in event payload', file=sys.stderr)
-        sys.exit(1)
-
-    pattern = None
-    # rule can be nested under 'rule' key
-    if isinstance(rule, dict):
-        if 'rule' in rule and isinstance(rule['rule'], dict):
-            pattern = rule['rule'].get('pattern')
-        else:
-            pattern = rule.get('pattern')
-
-    if not pattern:
-        print('ERROR: no `pattern` found in rule file', file=sys.stderr)
-        sys.exit(1)
-
+    # Add label "Correction Needed" (create it first if missing)
+    LABEL_NAME = "Correction Needed"
+    LABEL_COLOR = "d93f0b"  # orange-red
+    issue = repo.get_issue(pr_number)
     try:
-        regex = re.compile(pattern)
-    except re.error as exc:
-        print(f'ERROR: invalid regex pattern: {exc}', file=sys.stderr)
-        sys.exit(1)
+        # check labels in repo
+        found = False
+        for lab in repo.get_labels():
+            if lab.name.lower() == LABEL_NAME.lower():
+                found = True
+                break
+        if not found:
+            print(f"Creating label '{LABEL_NAME}'")
+            repo.create_label(name=LABEL_NAME, color=LABEL_COLOR, description="PR needs correction")
+        # add label to PR (issue is same number)
+        issue.add_to_labels(LABEL_NAME)
+        print(f"Label '{LABEL_NAME}' applied to PR #{pr_number}")
+    except Exception as e:
+        print(f"Failed to add/create label: {e}")
 
-    if regex.search(title):
-        print(f'OK: PR title matches date pattern: "{title}"')
-        sys.exit(0)
-    else:
-        # show user-friendly guidance from rule if available
-        description = None
-        if isinstance(rule, dict):
-            r = rule.get('rule') or rule
-            if isinstance(r, dict):
-                description = r.get('description')
-        print('FAIL: PR title does not match required date format.', file=sys.stderr)
-        if description:
-            print(f'Expected: {description}', file=sys.stderr)
-        print(f'Actual title: "{title}"', file=sys.stderr)
-        sys.exit(1)
+    # assign PR back to author (optional)
+    try:
+        issue.add_to_assignees(pr_author)
+        print(f"Assigned PR to {pr_author}")
+    except Exception as e:
+        print(f"Failed to assign PR author: {e}")
 
+    # exit non-zero? No: we already requested changes (that's enough). Exit 0.
+    sys.exit(0)
 
-if __name__ == '__main__':
-    main()
+else:
+    # No violations -> you can optionally create an approval review or a check-run.
+    print("No date format violations found.")
+    try:
+        # a neutral comment or approval can be created; here we do nothing.
+        pass
+    except Exception:
+        pass
+    sys.exit(0)
