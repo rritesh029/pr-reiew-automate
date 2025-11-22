@@ -1,0 +1,7 @@
+rule:
+  id: pr-title-date-format
+  description: "PR title must start with a date in YYYY-MM-DD format."
+  pattern: "^\\d{4}-\\d{2}-\\d{2}"
+  examples:
+    - valid: "2025-11-22: Add feature X"
+    - invalid: "Add feature X - 2025/11/22"
