@@ -60,6 +60,73 @@ date_candidate_pattern = re.compile(
     r')\s+([0-9]{1,2}),\s+([0-9]{4})\b'
 )
 
+# --- helper to compute line number ---
+def find_line_number_in_full_content(content: str, token: str):
+    """
+    Return 1-based line number of the first line in content that contains token.
+    """
+    lines = content.splitlines()
+    for i, line in enumerate(lines):
+        if token in line:
+            return i + 1
+    return None
+
+def find_line_number_in_patch(patch: str, token: str):
+    """
+    Parse unified diff patch and return the 1-based line number in the new file where token first appears.
+    Strategy:
+      - parse hunk headers like "@@ -a,b +c,d @@"
+      - track current new-file line number (starts at c)
+      - iterate lines: ' ' and '+' increment new-file line number; '-' does not.
+      - when a '+' or ' ' line (i.e. present in new file) contains token, return current new-file line number.
+    """
+    if not patch:
+        return None
+    new_line_num = None
+    for raw_line in patch.splitlines():
+        if raw_line.startswith('@@'):
+            # parse hunk header
+            # example: @@ -1,3 +1,9 @@
+            try:
+                header = raw_line
+                parts = header.split()
+                # parts[2] is like '+c,d' or '+c'
+                plus_part = next((p for p in parts if p.startswith('+')), None)
+                if plus_part:
+                    plus_part = plus_part.lstrip('+')
+                    if ',' in plus_part:
+                        start_str = plus_part.split(',')[0]
+                    else:
+                        start_str = plus_part
+                    new_line_num = int(start_str)
+                else:
+                    new_line_num = 1
+            except Exception:
+                new_line_num = None
+            continue
+
+        if new_line_num is None:
+            continue
+
+        if raw_line.startswith('\\'):
+            # ignore "\ No newline at end of file"
+            continue
+
+        line_type = raw_line[:1]
+        content = raw_line[1:]
+
+        # consider only lines present in the new file (space ' ' or added '+')
+        if token in content and line_type != '-':
+            return new_line_num
+
+        # increment new-file line number for lines that are in the new file
+        if line_type in (' ', '+'):
+            new_line_num += 1
+        # if '-', do not increment new_line_num
+
+    return None
+
+# iterate changed files
 for f in files:
     filename = f.filename
     if not filename.lower().endswith(".json"):
@@ -67,30 +134,34 @@ for f in files:
 
     print(f"Checking file: {filename}")
 
-    # Fix indentation of THIS whole block ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-
+    raw = ""
+    is_full_content = False
     try:
-        # Prefer to fetch from PR head repo
         head_repo_obj = pull.head.repo or repo
         head_ref = pull.head.ref
+    except Exception as e:
+        print(f"Failed to read pull.head info: {e}")
+        head_repo_obj = repo
+        head_ref = None
 
+    if head_ref:
         try:
             content_file = head_repo_obj.get_contents(filename, ref=head_ref)
             raw = b64decode(content_file.content).decode("utf-8", errors="ignore")
-
+            is_full_content = True
+            print(f"Fetched content for {filename} from {head_repo_obj.full_name}@{head_ref}")
         except UnknownObjectException:
-            print(f"Could not fetch raw content for {filename}; trying patch.")
+            print(f"File {filename} not found at {head_repo_obj.full_name}@{head_ref}. Using patch fallback.")
             raw = f.patch or ""
-
+            is_full_content = False
         except Exception as e:
-            print(f"Failed to get_contents for {filename}: {e}")
+            print(f"Error fetching {filename}: {e}. Using patch fallback.")
             raw = f.patch or ""
-
-    except Exception as e:
-        print(f"Unexpected error fetching content for {filename}: {e}")
-        raw = ""
-
-    # ↑↑↑ FIXED ONLY THIS — no logic changed
+            is_full_content = False
+    else:
+        raw = f.patch or ""
+        is_full_content = False
+        print(f"No head_ref; using patch fallback for {filename}.")
 
     if not raw:
         print(f"No content available for {filename} (empty raw). Skipping.")
@@ -99,14 +170,37 @@ for f in files:
     for match in date_candidate_pattern.finditer(raw):
         token = match.group(0).strip()
         if not allowed_regex.match(token):
-            violations.append({"file": filename, "bad_date": token})
-            print(f"Violation in {filename}: {token}")
+            # compute line number depending on whether we have full content or patch
+            line_no = None
+            try:
+                if is_full_content:
+                    line_no = find_line_number_in_full_content(raw, token)
+                else:
+                    line_no = find_line_number_in_patch(raw, token)
+            except Exception as e:
+                print(f"Error computing line number for token {token} in {filename}: {e}")
+                line_no = None
 
-# Review + Label + Assign logic (unchanged)
+            violations.append({
+                "file": filename,
+                "bad_date": token,
+                "line": line_no
+            })
+            if line_no:
+                print(f"Violation in {filename}: {token} (line {line_no})")
+            else:
+                print(f"Violation in {filename}: {token} (line unknown)")
+
+# If violations exist -> create a review REQUEST_CHANGES + add label + assign PR author
 if violations:
-    lines = ["Automated review: Date format violations detected.", ""]
+    lines = []
+    lines.append("Automated review: Date format violations detected.")
+    lines.append("")
     for v in violations:
-        lines.append(f"- File `{v['file']}` contains date `{v['bad_date']}` which is not in allowed format.")
+        if v.get("line"):
+            lines.append(f"- LINE NO {v['line']}: File `{v['file']}` contains date `{v['bad_date']}` which is not in allowed format.")
+        else:
+            lines.append(f"- File `{v['file']}` contains date `{v['bad_date']}` which is not in allowed format.")
     lines.append("")
     lines.append("Expected format: `Month D, YYYY` (e.g. `November 1, 2025`). Please fix all occurrences.")
     body = "\n".join(lines)
@@ -114,21 +208,26 @@ if violations:
     print("Creating review (REQUEST_CHANGES)...")
     try:
         pull.create_review(body=body, event="REQUEST_CHANGES")
-        print("Review created.")
+        print("Review created with REQUEST_CHANGES.")
     except Exception as e:
         print(f"Failed to create review: {e}")
 
     LABEL_NAME = "Correction Needed"
+    LABEL_COLOR = "d93f0b"
     issue = repo.get_issue(pr_number)
-
     try:
-        existing = any(lab.name.lower() == LABEL_NAME.lower() for lab in repo.get_labels())
-        if not existing:
-            repo.create_label(name=LABEL_NAME, color="d93f0b", description="PR needs correction")
+        found = False
+        for lab in repo.get_labels():
+            if lab.name.lower() == LABEL_NAME.lower():
+                found = True
+                break
+        if not found:
+            print(f"Creating label '{LABEL_NAME}'")
+            repo.create_label(name=LABEL_NAME, color=LABEL_COLOR, description="PR needs correction")
         issue.add_to_labels(LABEL_NAME)
-        print(f"Label applied to PR #{pr_number}")
+        print(f"Label '{LABEL_NAME}' applied to PR #{pr_number}")
     except Exception as e:
-        print(f"Failed to add label: {e}")
+        print(f"Failed to add/create label: {e}")
 
     try:
         issue.add_to_assignees(pr_author)
