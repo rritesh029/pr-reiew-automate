@@ -59,6 +59,11 @@ except FileNotFoundError:
 allowed_regex_str = rules.get("allowed_date_regex") or \
     r'^(January|February|March|April|May|June|July|August|September|October|November|December) ([1-9]|[12][0-9]|3[01]), \d{4}$'
 allowed_regex = re.compile(allowed_regex_str)
+token = match.group(0).strip()
+token = " ".join(token.split())
+if not allowed_regex.fullmatch(token):
+    violations.append({"file": filename, "bad_date": token})
+    print(f"Violation found in {filename}: {token}")
 
 # Candidate date pattern to find tokens (broad capture)
 date_candidate_pattern = re.compile(
