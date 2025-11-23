@@ -1,12 +1,25 @@
 #!/usr/bin/env python3
+"""
+PR date format reviewer (value-only JSON scanning) — minimal, robust, and keeps your original flow.
+
+Behavior:
+- Parses changed .json files in the PR (prefers full file content; falls back to patch).
+- Parses JSON values and validates only string values for date tokens.
+- Normalizes tokens (NFKC, spaces, punctuation, zero-width chars).
+- Validates against allowed regex from .github/pr-rules/date_format.yml (fullmatch).
+- Reports violations in a single REQUEST_CHANGES review with bullets that include LINE NO.
+- Applies/creates "Correction Needed" label and assigns the PR author.
+"""
 import os
 import json
 import re
 import sys
-from github import Github
-import yaml
+import unicodedata
 from base64 import b64decode
+
+from github import Github
 from github.GithubException import UnknownObjectException
+import yaml
 
 # --- config / env ---
 GITHUB_EVENT_PATH = os.environ.get("GITHUB_EVENT_PATH")
@@ -37,7 +50,7 @@ if not pr_number:
 RULE_PATH = ".github/pr-rules/date_format.yml"
 try:
     with open(RULE_PATH, "r") as rf:
-        rules = yaml.safe_load(rf)
+        rules = yaml.safe_load(rf) or {}
 except FileNotFoundError:
     print(f"Rule file {RULE_PATH} not found — using defaults.")
     rules = {}
@@ -54,40 +67,29 @@ pull = repo.get_pull(pr_number)
 files = list(pull.get_files())
 violations = []
 
-# Make the candidate detector permissive (catch any Word D, YYYY)
+# Candidate token inside a string value: permissive capture Word D, YYYY
 date_candidate_pattern = re.compile(r'\b([A-Za-z]+)\s+([0-9]{1,2}),\s+([0-9]{4})\b')
 
-# --- helper to compute line number ---
-def find_line_number_in_full_content(content: str, token: str):
-    """
-    Return 1-based line number of the first line in content that contains token.
-    """
-    lines = content.splitlines()
-    for i, line in enumerate(lines):
-        if token in line:
-            return i + 1
-    return None
+# --- helpers ---
+def find_line_number_in_full_content(content: str, target: str):
+    """Return 1-based line number of first line containing target (exact substring), or None."""
+    idx = content.find(target)
+    if idx == -1:
+        return None
+    return content[:idx].count('\n') + 1
 
 def find_line_number_in_patch(patch: str, token: str):
     """
-    Parse unified diff patch and return the 1-based line number in the new file where token first appears.
-			 
-												 
-														
-																				
-																											  
+    Parse unified diff patch and return the 1-based new-file line number where token first appears.
+    This tries to map token to the new file line numbers using hunk headers.
     """
     if not patch:
         return None
     new_line_num = None
     for raw_line in patch.splitlines():
         if raw_line.startswith('@@'):
-							   
-									  
             try:
-                header = raw_line
-                parts = header.split()
-												 
+                parts = raw_line.split()
                 plus_part = next((p for p in parts if p.startswith('+')), None)
                 if plus_part:
                     plus_part = plus_part.lstrip('+')
@@ -106,33 +108,52 @@ def find_line_number_in_patch(patch: str, token: str):
             continue
 
         if raw_line.startswith('\\'):
-												  
             continue
 
         line_type = raw_line[:1]
         content = raw_line[1:]
 
-        # consider only lines present in the new file (space ' ' or added '+')
         if token in content and line_type != '-':
             return new_line_num
 
-																		   
         if line_type in (' ', '+'):
             new_line_num += 1
-											   
 
     return None
 
-# normalize token helper
 def normalize_token_for_matching(token: str) -> str:
-    t = token.strip()
-    t = t.replace('\u00A0', ' ')
-    # remove zero-width and directionality chars
-    t = re.sub(r'[\u200B\u200C\u200D\u200E\u200F]', '', t)
-    t = re.sub(r'\s+', ' ', t)
+    """
+    Normalize token for regex matching:
+    - Unicode NFKC (converts fullwidth digits/punct to ASCII)
+    - Replace a set of special spaces with ASCII space
+    - Normalize some punctuation (fullwidth comma etc.)
+    - Remove common zero-width / bidi characters
+    - Collapse whitespace
+    """
+    t = unicodedata.normalize("NFKC", token)
+    # normalize common spaces
+    for s in ('\u00A0', '\u202F', '\u2009', '\u2002', '\u2003', '\u3000'):
+        t = t.replace(s, ' ')
+    # punctuation normalization
+    t = t.replace('\uFF0C', ',')  # fullwidth comma
+    # remove zero-width / directionality
+    t = re.sub(r'[\u200B\u200C\u200D\u200E\u200F\u2060\uFEFF]', '', t)
+    t = re.sub(r'\s+', ' ', t).strip()
     return t
 
-# iterate changed files
+def iter_strings_from_json(obj):
+    """Yield all string values from parsed JSON (recursive)."""
+    if isinstance(obj, str):
+        yield obj
+    elif isinstance(obj, dict):
+        for v in obj.values():
+            yield from iter_strings_from_json(v)
+    elif isinstance(obj, list):
+        for item in obj:
+            yield from iter_strings_from_json(item)
+    # other JSON types ignored
+
+# --- main processing per-file ---
 for f in files:
     filename = f.filename
     if not filename.lower().endswith(".json"):
@@ -173,39 +194,67 @@ for f in files:
         print(f"No content available for {filename} (empty raw). Skipping.")
         continue
 
-    for match in date_candidate_pattern.finditer(raw):
-        token_orig = match.group(0).strip()
-        # normalize token before matching against allowed regex
-        token_norm = normalize_token_for_matching(token_orig)
+    # Try parsing JSON to inspect values only (safer). Fall back to raw scanning if parse fails.
+    parsed = None
+    try:
+        parsed = json.loads(raw)
+    except Exception:
+        parsed = None
 
-        # use fullmatch to ensure entire token matches pattern
-        is_allowed = bool(allowed_regex.fullmatch(token_norm))
+    if parsed is not None:
+        # inspect only string values from JSON
+        for val in iter_strings_from_json(parsed):
+            for match in date_candidate_pattern.finditer(val):
+                token_orig = match.group(0).strip()
+                token_norm = normalize_token_for_matching(token_orig)
+                is_allowed = bool(allowed_regex.fullmatch(token_norm))
+                if not is_allowed:
+                    # find line number in raw content: search for the JSON value occurrence; fallback to token search
+                    line_no = None
+                    try:
+                        # search for exact JSON value occurrence first (with quotes)
+                        idx = raw.find(f'"{val}"')
+                        if idx == -1:
+                            # search raw for value without quotes
+                            idx = raw.find(val)
+                        if idx != -1:
+                            line_no = raw[:idx].count('\n') + 1
+                        else:
+                            # fallback: try token search
+                            if is_full_content:
+                                line_no = find_line_number_in_full_content(raw, token_orig) or find_line_number_in_full_content(raw, token_norm)
+                            else:
+                                line_no = find_line_number_in_patch(f.patch or "", token_orig) or find_line_number_in_patch(f.patch or "", token_norm)
+                    except Exception:
+                        line_no = None
 
-        if not is_allowed:
-            # compute line number: try to find the original token first, fallback to normalized token
-            line_no = None
-            try:
-                if is_full_content:
-                    line_no = find_line_number_in_full_content(raw, token_orig)
-                    if line_no is None and token_norm != token_orig:
-                        line_no = find_line_number_in_full_content(raw, token_norm)
-                else:
-                    line_no = find_line_number_in_patch(raw, token_orig)
-                    if line_no is None and token_norm != token_orig:
-                        line_no = find_line_number_in_patch(raw, token_norm)
-            except Exception as e:
-                print(f"Error computing line number for token {token_orig} in {filename}: {e}")
+                    violations.append({"file": filename, "bad_date": token_orig, "line": line_no})
+                    if line_no:
+                        print(f"Violation in {filename}: {token_orig} (line {line_no})")
+                    else:
+                        print(f"Violation in {filename}: {token_orig} (line unknown)")
+
+    else:
+        # fallback: scan raw text for candidates (previous behavior)
+        for match in date_candidate_pattern.finditer(raw):
+            token_orig = match.group(0).strip()
+            token_norm = normalize_token_for_matching(token_orig)
+            is_allowed = bool(allowed_regex.fullmatch(token_norm))
+            if not is_allowed:
                 line_no = None
+                try:
+                    if is_full_content:
+                        line_no = find_line_number_in_full_content(raw, token_orig) or find_line_number_in_full_content(raw, token_norm)
+                    else:
+                        line_no = find_line_number_in_patch(f.patch or "", token_orig) or find_line_number_in_patch(f.patch or "", token_norm)
+                except Exception:
+                    line_no = None
 
-            violations.append({
-                "file": filename,
-                "bad_date": token_orig,
-                "line": line_no
-            })
-            if line_no:
-                print(f"Violation in {filename}: {token_orig} (line {line_no})")
-            else:
-                print(f"Violation in {filename}: {token_orig} (line unknown)")
+                violations.append({"file": filename, "bad_date": token_orig, "line": line_no})
+                if line_no:
+                    print(f"Violation in {filename}: {token_orig} (line {line_no})")
+                else:
+                    print(f"Violation in {filename}: {token_orig} (line unknown)")
 
 # If violations exist -> create a review REQUEST_CHANGES + add label + assign PR author
 if violations:
@@ -252,7 +301,6 @@ if violations:
         print(f"Failed to assign PR author: {e}")
 
     sys.exit(0)
-
 else:
     print("No date format violations found.")
     sys.exit(0)
