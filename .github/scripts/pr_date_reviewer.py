@@ -219,4 +219,3 @@ else:
 
     print("No violations found")
     sys.exit(0)
-```
