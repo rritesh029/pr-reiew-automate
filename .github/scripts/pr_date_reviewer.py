@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 
 import os
@@ -8,7 +9,6 @@ from datetime import datetime
 from base64 import b64decode
 
 from github import Github, Auth
-from github.GithubException import UnknownObjectException
 
 
 # ---------------- ENV VARIABLES ----------------
@@ -35,7 +35,7 @@ pr_number = pr_dict["number"]
 pr_author = pr_dict["user"]["login"]
 
 
-# ---------------- DATE RULE ----------------
+# ---------------- DATE RULES ----------------
 
 allowed_date_regex = re.compile(
     r'^(January|February|March|April|May|June|July|August|September|October|November|December) (?:[1-9]|[12][0-9]|3[01]), \d{4}$'
@@ -50,7 +50,8 @@ date_candidate_pattern = re.compile(
 )
 
 
-# today's date
+# ---------------- TODAY DATE ----------------
+
 today = datetime.utcnow()
 
 if sys.platform == "win32":
@@ -100,17 +101,17 @@ for f in files:
 
     try:
 
-        head_ref = pull.head.ref
-        head_repo = pull.head.repo or repo
+        # Fetch file content using PR HEAD SHA (critical fix)
+        head_sha = pull.head.sha
 
-        content = head_repo.get_contents(filename, ref=head_ref)
+        content = repo.get_contents(filename, ref=head_sha)
 
         raw = b64decode(content.content).decode("utf-8", errors="ignore")
 
-    except UnknownObjectException:
-        raw = f.patch or ""
+    except Exception as e:
 
-    except Exception:
+        print(f"Fallback to patch for {filename}: {e}")
+
         raw = f.patch or ""
 
     if not raw:
@@ -219,3 +220,4 @@ else:
 
     print("No violations found")
     sys.exit(0)
+
