@@ -1,21 +1,12 @@
 #!/usr/bin/env python3
-"""
-Robust PR date format reviewer (extended).
-
-Checks:
-1. Date format validation (Month D, YYYY).
-2. Ensures JSON keys `lastUpdate` or `x-modified` contain today's system date.
-3. Works with nested JSON structures.
-4. Works for PRs and additional commits pushed to PR.
-"""
 
 import os
 import sys
 import json
 import re
 import yaml
-from datetime import datetime
 from base64 import b64decode
+from datetime import datetime
 
 from github import Github, GithubException, Auth
 from github.GithubException import UnknownObjectException
@@ -32,39 +23,23 @@ if not (GITHUB_EVENT_PATH and GITHUB_TOKEN and GITHUB_REPOSITORY):
     sys.exit(1)
 
 
-# ---------------- EVENT ----------------
+# ---------------- LOAD EVENT ----------------
 
 with open(GITHUB_EVENT_PATH, "r") as f:
     event = json.load(f)
 
 pr_dict = event.get("pull_request")
-
 if not pr_dict:
-    print("No PR found in event payload")
     sys.exit(0)
 
-pr_number = pr_dict["number"]
-pr_author = pr_dict["user"]["login"]
+pr_number = pr_dict.get("number")
+pr_author = pr_dict.get("user", {}).get("login")
 
 
-# ---------------- RULES ----------------
-
-RULE_PATH = ".github/pr-rules/date_format.yml"
+# ---------------- DATE RULE ----------------
 
 default_allowed_regex = r'^(January|February|March|April|May|June|July|August|September|October|November|December) (?:[1-9]|[12][0-9]|3[01]), \d{4}$'
-
-try:
-    with open(RULE_PATH) as rf:
-        rules = yaml.safe_load(rf) or {}
-except:
-    rules = {}
-
-allowed_regex_str = rules.get("allowed_date_regex", default_allowed_regex)
-
-allowed_regex = re.compile(allowed_regex_str)
-
-
-# ---------------- DATE TOKEN SEARCH ----------------
+allowed_regex = re.compile(default_allowed_regex)
 
 date_candidate_pattern = re.compile(
     r'\b('
@@ -74,211 +49,160 @@ date_candidate_pattern = re.compile(
     flags=re.IGNORECASE
 )
 
-
-# ---------------- SYSTEM DATE ----------------
-
-today = datetime.now()
-
-today_string = today.strftime("%B %-d, %Y") if os.name != "nt" else today.strftime("%B %#d, %Y")
-
-print("System Date:", today_string)
+# today date
+today = datetime.utcnow()
+today_string = today.strftime("%B %-d, %Y") if sys.platform != "win32" else today.strftime("%B %#d, %Y")
 
 
-# ---------------- GITHUB ----------------
+# ---------------- GITHUB CLIENT ----------------
 
 gh = Github(auth=Auth.Token(GITHUB_TOKEN))
 repo = gh.get_repo(GITHUB_REPOSITORY)
 pull = repo.get_pull(pr_number)
 
-files = list(pull.get_files())
 
-print("Files changed:", len(files))
+# ---------------- HELPERS ----------------
 
-
-violations = []
-date_update_violations = []
-
-
-# ---------------- UTILITIES ----------------
-
-def normalize_token(tok: str) -> str:
+def normalize_token(tok):
     tok = tok.strip()
     tok = " ".join(tok.split())
-    if (tok.startswith('"') and tok.endswith('"')) or (tok.startswith("'") and tok.endswith("'")):
+    if tok.startswith('"') and tok.endswith('"'):
         tok = tok[1:-1]
     return tok
 
 
-def find_update_keys(obj, path="root"):
+def get_section_name(filename):
     """
-    Recursively find lastUpdate / x-modified keys in nested JSON
+    nextgen-abc-xyz-overview.json -> OVERVIEW
     """
-
-    results = []
-
-    if isinstance(obj, dict):
-        for k, v in obj.items():
-
-            key_lower = k.lower()
-
-            if key_lower in ["lastupdate", "x-modified", "x-modified-date"]:
-                results.append((path + "." + k, v))
-
-            results.extend(find_update_keys(v, path + "." + k))
-
-    elif isinstance(obj, list):
-
-        for i, item in enumerate(obj):
-            results.extend(find_update_keys(item, path + f"[{i}]"))
-
-    return results
+    base = os.path.basename(filename)
+    name = base.split(".")[0]
+    section = name.split("-")[-1]
+    return section.upper()
 
 
 # ---------------- PROCESS FILES ----------------
+
+files = list(pull.get_files())
+violations = {}
 
 for f in files:
 
     filename = f.filename
 
-    if not filename.lower().endswith(".json"):
+    if not filename.endswith(".json"):
         continue
-
-    print("Checking:", filename)
 
     raw = ""
 
     try:
-
         head_ref = pull.head.ref
         head_repo = pull.head.repo or repo
-
-        content = head_repo.get_contents(filename, ref=head_ref)
-
-        raw = b64decode(content.content).decode("utf-8", errors="ignore")
-
-    except:
-
+        content_file = head_repo.get_contents(filename, ref=head_ref)
+        raw = b64decode(content_file.content).decode("utf-8", errors="ignore")
+    except Exception:
         raw = f.patch or ""
 
     if not raw:
         continue
 
+    section = get_section_name(filename)
 
-    # -------- DATE FORMAT CHECK --------
+    if section not in violations:
+        violations[section] = []
 
-    for match in date_candidate_pattern.finditer(raw):
+    lines = raw.splitlines()
 
-        token = normalize_token(match.group(0))
+    for i, line in enumerate(lines, start=1):
 
-        if not allowed_regex.fullmatch(token):
+        # -------- DATE FORMAT CHECK --------
 
-            violations.append({
-                "file": filename,
-                "bad_date": token
-            })
+        for match in date_candidate_pattern.finditer(line):
 
+            token = normalize_token(match.group(0))
 
-    # -------- JSON CHECK --------
+            if not allowed_regex.fullmatch(token):
+                violations[section].append(
+                    f"LINE {i} : contains {token} which is not in format Month D, YYYY"
+                )
 
-    try:
+        # -------- lastUpdate / x-modified CHECK --------
 
-        data = json.loads(raw)
+        key_match = re.search(r'"(lastUpdate|x-modified)"\s*:\s*"([^"]+)"', line)
 
-    except:
+        if key_match:
 
-        print("Invalid JSON:", filename)
+            key = key_match.group(1)
+            value = key_match.group(2)
 
-        continue
+            value = normalize_token(value)
 
+            if value != today_string:
 
-    update_keys = find_update_keys(data)
-
-    for path, value in update_keys:
-
-        if isinstance(value, str):
-
-            val_norm = normalize_token(value)
-
-            if val_norm != today_string:
-
-                date_update_violations.append({
-                    "file": filename,
-                    "key": path,
-                    "value": val_norm,
-                    "expected": today_string
-                })
+                violations[section].append(
+                    f"LINE {i} : {key} has value {value} but must be today's date {today_string}"
+                )
 
 
-# ---------------- REVIEW ----------------
+# ---------------- CREATE REVIEW ----------------
 
-if violations or date_update_violations:
+if violations:
 
-    lines = []
+    body_lines = []
+    body_lines.append("Automated review: Date validation errors detected.\n")
 
-    lines.append("Automated review issues detected.")
-    lines.append("")
+    for section, errors in violations.items():
 
-    if violations:
+        if not errors:
+            continue
 
-        lines.append("### Invalid Date Format")
+        body_lines.append(f"{section}:")
 
-        for v in violations:
+        for e in errors:
+            body_lines.append(e)
 
-            lines.append(
-                f"- `{v['file']}` contains `{v['bad_date']}` which is not in format `Month D, YYYY`"
-            )
+        body_lines.append("")
 
-        lines.append("")
-
-
-    if date_update_violations:
-
-        lines.append("### Update Date Required")
-
-        for v in date_update_violations:
-
-            lines.append(
-                f"- `{v['file']}` key `{v['key']}` has value `{v['value']}` but must be today's date `{v['expected']}`"
-            )
-
-        lines.append("")
-        lines.append("Please update the value to today's system date.")
-
-
-    body = "\n".join(lines)
-
-    print("Creating review...")
-
-    pull.create_review(
-        body=body,
-        event="REQUEST_CHANGES"
-    )
-
-
-    LABEL_NAME = "Correction Needed"
+    body = "\n".join(body_lines)
 
     try:
+        pull.create_review(
+            body=body,
+            event="REQUEST_CHANGES"
+        )
+    except Exception as e:
+        print(f"Failed creating review {e}")
 
+    # ---- label ----
+
+    LABEL = "Correction Needed"
+
+    try:
         repo.create_label(
-            name=LABEL_NAME,
+            name=LABEL,
             color="d93f0b",
             description="PR needs correction"
         )
-
     except:
         pass
 
+    try:
+        issue = repo.get_issue(pr_number)
+        issue.add_to_labels(LABEL)
+    except:
+        pass
 
-    issue = repo.get_issue(pr_number)
+    # ---- assign ----
 
-    issue.add_to_labels(LABEL_NAME)
-
-    if pr_author:
+    try:
+        issue = repo.get_issue(pr_number)
         issue.add_to_assignees(pr_author)
+    except:
+        pass
 
     sys.exit(0)
 
+else:
 
-print("No violations found")
-
-sys.exit(0)
+    print("No violations detected")
+    sys.exit(0)
