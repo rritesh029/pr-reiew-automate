@@ -1,181 +1,102 @@
-#!/usr/bin/env python3
-"""
-Robust PR date format reviewer.
-
-- Reads the GitHub event JSON (GITHUB_EVENT_PATH).
-- Uses PyGithub to fetch PR and changed files.
-- For each changed .json file, attempts to fetch file content from the PR head repo/ref.
-  - If fetching full content fails (forks / permission / missing file), falls back to using the file.patch.
-- Checks date tokens against the regex in the rule file (.github/pr-rules/date_format.yml).
-- If violations exist: creates a REQUEST_CHANGES review, adds "Correction Needed" label (creates if missing),
-  and assigns the PR author.
-"""
 import os
-import sys
 import json
-import re
-import yaml
-import time
-from base64 import b64decode
+from github import Github
+from openai import OpenAI
 
-from github import Github, GithubException, Auth
-from github.GithubException import UnknownObjectException
+# Initialize OpenAI client
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-# --- env / config
-GITHUB_EVENT_PATH = os.environ.get("GITHUB_EVENT_PATH")
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
-GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY")  # "owner/repo"
+PROMPT_DIR = ".github/prompts"
 
-if not (GITHUB_EVENT_PATH and GITHUB_TOKEN and GITHUB_REPOSITORY):
-    print("Missing required environment variables: GITHUB_EVENT_PATH, GITHUB_TOKEN, GITHUB_REPOSITORY")
-    sys.exit(1)
 
-# Load event payload
-with open(GITHUB_EVENT_PATH, "r") as f:
-    event = json.load(f)
+def load_prompts():
+    prompts = {}
+    for file in os.listdir(PROMPT_DIR):
+        if file.endswith(".txt"):
+            with open(os.path.join(PROMPT_DIR, file), "r") as f:
+                prompts[file] = f.read()
+    return prompts
 
-# Only proceed for pull_request events
-pr_dict = event.get("pull_request")
-if not pr_dict:
-    print("No 'pull_request' object in event payload. Exiting.")
-    sys.exit(0)
 
-pr_number = pr_dict.get("number")
-pr_author = pr_dict.get("user", {}).get("login")
-if not pr_number:
-    print("PR number not found in payload. Exiting.")
-    sys.exit(1)
+def call_llm(prompt, content):
+    final_prompt = prompt.replace("{content}", content)
 
-# Load rules (yaml)
-RULE_PATH = ".github/pr-rules/date_format.yml"
-try:
-    with open(RULE_PATH, "r") as rf:
-        rules = yaml.safe_load(rf) or {}
-except FileNotFoundError:
-    print(f"Rule file {RULE_PATH} not found — using default regex.")
-    rules = {}
+    response = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=[{"role": "user", "content": final_prompt}],
+        temperature=0
+    )
 
-allowed_regex_str = rules.get("allowed_date_regex") or \
-    r'^(January|February|March|April|May|June|July|August|September|October|November|December) ([1-9]|[12][0-9]|3[01]), \d{4}$'
-allowed_regex = re.compile(allowed_regex_str)
+    return response.choices[0].message.content
 
-# Candidate date pattern to find tokens (broad capture)
-date_candidate_pattern = re.compile(
-    r'\b('
-    r'January|February|March|April|May|June|July|August|September|October|November|December'
-    r')\s+([0-9]{1,2}),\s+([0-9]{4})\b'
-)
 
-# Initialize PyGithub (use new auth style to silence deprecation)
-gh = Github(auth=Auth.Token(GITHUB_TOKEN))
-repo = gh.get_repo(GITHUB_REPOSITORY)
-pull = repo.get_pull(pr_number)  # PyGithub PullRequest object
+def parse_response(output):
+    try:
+        return json.loads(output)
+    except Exception:
+        print("⚠️ Invalid JSON from LLM:", output)
+        return []
 
-print(f"Processing PR #{pr_number} by @{pr_author} in repo {GITHUB_REPOSITORY}")
 
-# Gather changed files via pull.get_files()
-files = list(pull.get_files())
-print(f"Found {len(files)} changed file(s) in PR #{pr_number}.")
+def build_comments(issues, file_path):
+    comments = []
 
-violations = []
+    for issue in issues:
+        if "line" not in issue:
+            continue
 
-for f in files:
-    filename = f.filename
-    if not filename.lower().endswith(".json"):
-        # skip non-json
-        continue
+        comments.append({
+            "path": file_path,
+            "line": issue["line"],
+            "side": "RIGHT",
+            "body": f"""
+❌ **{issue.get('issue', 'Issue')}**
 
-    print(f"Checking file: {filename}")
+Text: `{issue.get('text', '')}`  
+Suggestion: `{issue.get('suggestion', '')}`
+"""
+        })
 
-    raw = ""
-    # Determine head repo/ref to fetch content (handles forks)
-    try:
-        head_ref = pull.head.ref  # branch name in the head repo
-        head_repo_obj = pull.head.repo  # Repository object for the head (may be None in weird cases)
-        if head_repo_obj is None:
-            print("pull.head.repo is None, defaulting to base repo.")
-            head_repo_obj = repo
-        try:
-            content_file = head_repo_obj.get_contents(filename, ref=head_ref)
-            raw = b64decode(content_file.content).decode("utf-8", errors="ignore")
-            print(f"Fetched full content for {filename} from {head_repo_obj.full_name}@{head_ref}")
-        except UnknownObjectException:
-            # File may not exist at that path in head ref or permissions; fallback to patch
-            print(f"get_contents returned 404 for {filename} in {head_repo_obj.full_name}@{head_ref}; using patch fallback.")
-            raw = f.patch or ""
-        except GithubException as e:
-            print(f"GitHub API error fetching content for {filename}: {e}. Using patch fallback if available.")
-            raw = f.patch or ""
-        except Exception as e:
-            print(f"Unexpected error when fetching {filename}: {e}. Using patch fallback if available.")
-            raw = f.patch or ""
-    except Exception as e:
-        print(f"Error preparing to fetch {filename}: {e}. Using patch fallback if available.")
-        raw = f.patch or ""
+    return comments
 
-    if not raw:
-        print(f"No content available for {filename} (empty raw). Skipping.")
-        continue
 
-    # Search for date tokens and validate each found token
-    for match in date_candidate_pattern.finditer(raw):
-        token = match.group(0).strip()
-        if not allowed_regex.match(token):
-            violations.append({"file": filename, "bad_date": token})
-            print(f"Violation found in {filename}: {token}")
+def main():
+    g = Github(os.environ["GITHUB_TOKEN"])
+    repo = g.get_repo(os.environ["GITHUB_REPOSITORY"])
 
-# If violations: create review, add label, assign
-if violations:
-    # Build the review body
-    lines = []
-    lines.append("Automated review: Date format violations detected.")
-    lines.append("")
-    for v in violations:
-        lines.append(f"- File `{v['file']}` contains date `{v['bad_date']}` which is not in allowed format.")
-    lines.append("")
-    lines.append("Expected format: `Month D, YYYY` (e.g. `November 1, 2025`). Please fix all occurrences.")
-    body = "\n".join(lines)
+    with open(os.environ["GITHUB_EVENT_PATH"]) as f:
+        event = json.load(f)
 
-    print("Creating a REQUEST_CHANGES review...")
-    try:
-        # Create a review (summary-level). For inline comments you can build a 'comments' array with path/position.
-        pull.create_review(body=body, event="REQUEST_CHANGES")
-        print("Review created (REQUEST_CHANGES).")
-    except Exception as e:
-        print(f"Failed to create review: {e}")
+    pr_number = event["pull_request"]["number"]
+    pr = repo.get_pull(pr_number)
 
-    # Add label (create if not present)
-    LABEL_NAME = "Correction Needed"
-    LABEL_COLOR = "d93f0b"
-    try:
-        # create label if missing
-        existing = None
-        for lab in repo.get_labels():
-            if lab.name.lower() == LABEL_NAME.lower():
-                existing = lab
-                break
-        if not existing:
-            print(f"Label '{LABEL_NAME}' not found; creating it.")
-            repo.create_label(name=LABEL_NAME, color=LABEL_COLOR, description="PR needs correction")
-        # apply label to the PR (issues API)
-        issue = repo.get_issue(pr_number)
-        issue.add_to_labels(LABEL_NAME)
-        print(f"Applied label '{LABEL_NAME}' to PR #{pr_number}.")
-    except Exception as e:
-        print(f"Failed to create/apply label '{LABEL_NAME}': {e}")
+    prompts = load_prompts()
+    all_comments = []
 
-    # Assign PR back to author
-    try:
-        issue = repo.get_issue(pr_number)
-        if pr_author:
-            issue.add_to_assignees(pr_author)
-            print(f"Assigned PR #{pr_number} to @{pr_author}.")
-    except Exception as e:
-        print(f"Failed to assign PR to @{pr_author}: {e}")
+    for file in pr.get_files():
+        if not file.patch:
+            continue
 
-    # Exit 0 (we created a review so no need to fail the job)
-    sys.exit(0)
-else:
-    print("No date format violations found.")
-    # Optionally you can create an APPROVE review here
-    sys.exit(0)
+        print(f"Reviewing file: {file.filename}")
+
+        for prompt_name, prompt_text in prompts.items():
+            print(f"  → Running prompt: {prompt_name}")
+
+            output = call_llm(prompt_text, file.patch)
+            issues = parse_response(output)
+
+            comments = build_comments(issues, file.filename)
+            all_comments.extend(comments)
+
+    if all_comments:
+        pr.create_review(
+            body="🤖 AI Review (Grammar / Spelling / Date Checks)",
+            event="COMMENT",
+            comments=all_comments
+        )
+    else:
+        print("✅ No issues found")
+
+
+if __name__ == "__main__":
+    main()
