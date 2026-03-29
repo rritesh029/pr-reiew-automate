@@ -215,7 +215,7 @@ for f in files:
 if violations:
 
     body_lines = []
-    body_lines.append("Combined Review: Date + Language Issues\n")
+    body_lines.append("🤖Combined Review: Date + Language Issues\n")
 
     for file, errors in violations.items():
 
