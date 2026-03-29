@@ -24,7 +24,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install PyGithub pyyaml
+        run: pip install PyGithub pyyaml openai
 
       - name: Run PR date reviewer
         env:
