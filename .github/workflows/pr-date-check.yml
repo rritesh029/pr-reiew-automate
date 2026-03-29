@@ -1,35 +1,35 @@
-name: PR Date Format Reviewer
+name: AI PR Reviewer (Groq)
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: read            # read repository files
-  pull-requests: write      # create reviews
-  issues: write             # add labels & assignees
+  contents: read
+  pull-requests: write
 
 jobs:
-  pr-date-check:
+  ai-review:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Install dependencies
-        run: pip install PyGithub pyyaml openai
+        run: pip install PyGithub openai
 
-      - name: Run PR date reviewer
+      - name: Run AI Reviewer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python .github/scripts/pr_date_reviewer.py
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python .github/scripts/pr_ai_reviewer.py
