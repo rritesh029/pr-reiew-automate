@@ -53,14 +53,14 @@
   }
   {
   "content": [
-    { "line": 1, "text": "Ram a boy" },
-    { "line": 2, "text": "She go to school" },
-    { "line": 3, "text": "The color of sky is blue" },
-    { "line": 4, "text": "The organisation is located in center" },
-    { "line": 5, "text": "Date: 2024/12/01" },
-    { "line": 6, "text": "Date: 01-13-2024" },
-    { "line": 7, "text": "He eating food" },
-    { "line": 8, "text": "This is a centre point" }
+    { "text": "Ram a boy" },
+    { "text": "She go to school" },
+    { "text": "The color of sky is blue" },
+    { "text": "The organisation is located in center" },
+    { "text": "Date: 2024/12/01" },
+    { "text": "Date: 01-13-2024" },
+    { "text": "He eating food" },
+    { "text": "This is a center point" }
   ]
 }
 }
