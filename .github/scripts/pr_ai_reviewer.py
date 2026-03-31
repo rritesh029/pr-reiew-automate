@@ -108,8 +108,8 @@ def extract_text_fields(json_data):
             if len(text.split()) < 3:
                 return
 
-            # Skip dates / numeric heavy strings
-            if re.search(r'\d{4}', text):
+            # Skip ONLY pure date-like strings
+            if date_candidate_pattern.fullmatch(text.strip()):
                 return
 
             results.append((path, text))
