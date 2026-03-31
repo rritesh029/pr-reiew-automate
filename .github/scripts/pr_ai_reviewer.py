@@ -100,7 +100,7 @@ Check ONLY for:
 3. Spelling issues
 
 Rules:
-- Use Indian English (colour, centre are correct)
+- Use American English (colour, centre are correct)
 - DO NOT check dates
 - DO NOT modify numbers or dates
 
