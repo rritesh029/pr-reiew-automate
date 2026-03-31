@@ -33,9 +33,10 @@ if not pr_dict:
     sys.exit(0)
 
 pr_number = pr_dict["number"]
+pr_author = pr_dict["user"]["login"]
 
 
-# ---------------- DATE RULES ----------------
+# ---------------- DATE RULES (KEEP ORIGINAL) ----------------
 
 allowed_date_regex = re.compile(
     r'^(January|February|March|April|May|June|July|August|September|October|November|December) (?:[1-9]|[12][0-9]|3[01]), \d{4}$'
@@ -50,7 +51,7 @@ date_candidate_pattern = re.compile(
 )
 
 
-# ---------------- TODAY ----------------
+# ---------------- TODAY DATE ----------------
 
 today = datetime.utcnow()
 
@@ -86,79 +87,36 @@ def normalize_token(token):
     return token
 
 
-def extract_text_fields(json_data):
-    """
-    Extract ONLY meaningful English text fields from JSON
-    """
-    results = []
+# ---------------- AI REVIEW (ONLY LANGUAGE) ----------------
 
-    def recurse(obj, path=""):
-        if isinstance(obj, dict):
-            for k, v in obj.items():
-                recurse(v, f"{path}.{k}" if path else k)
-
-        elif isinstance(obj, list):
-            for i, item in enumerate(obj):
-                recurse(item, f"{path}[{i}]")
-
-        elif isinstance(obj, str):
-            text = obj.strip()
-
-            # Skip short or non-sentence strings
-            if len(text.split()) < 3:
-                return
-
-            # Skip ONLY pure date-like strings
-            if date_candidate_pattern.fullmatch(text.strip()):
-                return
-
-            results.append((path, text))
-
-    recurse(json_data)
-    return results
-
-
-def find_line_number(lines, text):
-    """
-    Map extracted text back to line number
-    """
-    for i, line in enumerate(lines, start=1):
-        if text in line:
-            return i
-    return "?"
-
-
-# ---------------- AI REVIEW ----------------
-
-def ai_review(text):
+def ai_review(content):
 
     prompt = f"""
-You are a strict English grammar reviewer.
+You are a strict language reviewer.
 
-Analyze ONLY natural English sentences.
-
-IGNORE:
-- JSON structure
-- keys
-- dates
-- numbers
+Check ONLY for:
+1. Grammar mistakes
+2. Sentence issues
+3. Spelling issues
 
 Rules:
-- Only report real mistakes
-- If no issue, return []
-- Do NOT return identical suggestions
+- Use Indian English (colour, centre are correct)
+- DO NOT check dates
+- DO NOT modify numbers or dates
 
-Return JSON:
+Return ONLY JSON:
+
 [
   {{
+    "line": <line_number>,
     "issue": "<grammar/spelling>",
     "text": "<problem>",
     "suggestion": "<fix>"
   }}
 ]
 
-Text:
-\"\"\"{text}\"\"\"
+Content:
+\"\"\"{content}\"\"\"
 """
 
     response = client.chat.completions.create(
@@ -170,20 +128,13 @@ Text:
     output = response.choices[0].message.content
 
     try:
-        data = json.loads(output)
+        return json.loads(output)
     except:
         match = re.search(r'\[.*\]', output, re.DOTALL)
         if match:
-            data = json.loads(match.group(0))
-        else:
-            return []
-
-    clean = []
-    for item in data:
-        if item["text"].strip() != item["suggestion"].strip():
-            clean.append(item)
-
-    return clean
+            return json.loads(match.group(0))
+        print("Invalid AI response:", output)
+        return []
 
 
 # ---------------- PROCESS FILES ----------------
@@ -203,23 +154,29 @@ for f in files:
 
     print(f"Checking {filename}")
 
+    raw = ""
+
     try:
         content = repo.get_contents(filename, ref=pull.head.sha)
         raw = b64decode(content.content).decode("utf-8", errors="ignore")
-    except:
+    except Exception as e:
+        print(f"Fallback to patch for {filename}: {e}")
         raw = f.patch or ""
 
     if not raw:
         continue
 
-    lines = raw.splitlines()
-    violations[filename] = []
+    if filename not in violations:
+        violations[filename] = []
 
-    # ---------------- DATE VALIDATION ----------------
+    lines = raw.splitlines()
+
+    # ---------------- REGEX DATE VALIDATION ----------------
 
     for line_no, line in enumerate(lines, start=1):
 
         for match in date_candidate_pattern.finditer(line):
+
             token = normalize_token(match.group(0))
 
             if not allowed_date_regex.fullmatch(token):
@@ -238,52 +195,41 @@ for f in files:
                     f"LINE {line_no} : {key} has value {value} but must be today's date {today_string}"
                 )
 
-    # ---------------- SAFE JSON PARSE ----------------
+    # ---------------- AI LANGUAGE VALIDATION ----------------
 
-    try:
-        json_obj = json.loads(raw)
-    except Exception as e:
-        print(f"Skipping AI review (invalid JSON): {e}")
-        continue
+    ai_issues = ai_review(raw)
 
-    # ---------------- AI TEXT REVIEW ----------------
+    for issue in ai_issues:
+        line = issue.get("line", "?")
+        msg = issue.get("issue", "")
+        text = issue.get("text", "")
+        suggestion = issue.get("suggestion", "")
 
-    text_fields = extract_text_fields(json_obj)
-
-    for path, text in text_fields:
-
-        issues = ai_review(text)
-
-        if not issues:
-            continue
-
-        line_no = find_line_number(lines, text)
-
-        for issue in issues:
-            violations[filename].append(
-                f"LINE {line_no} : {issue['issue']} → `{issue['text']}` | Suggestion: `{issue['suggestion']}`"
-            )
+        violations[filename].append(
+            f"LINE {line} : {msg} → `{text}` | Suggestion: `{suggestion}`"
+        )
 
 
 # ---------------- CREATE REVIEW ----------------
 
 if violations:
 
-    body = ["🤖 Combined Review: Date + Language Issues\n"]
+    body_lines = []
+    body_lines.append("🤖Combined Review: Date + Language Issues\n")
 
-    for file, errs in violations.items():
+    for file, errors in violations.items():
 
-        if not errs:
+        if not errors:
             continue
 
-        body.append(f"{file.upper()}:")
+        body_lines.append(f"{file.upper()}:")
 
-        for e in errs:
-            body.append(e)
+        for err in errors:
+            body_lines.append(err)
 
-        body.append("")
+        body_lines.append("")
 
-    review_body = "\n".join(body)
+    review_body = "\n".join(body_lines)
 
     try:
         pull.create_review(
@@ -293,7 +239,7 @@ if violations:
         print("Review created")
 
     except Exception as e:
-        print(f"Review failed: {e}")
+        print(f"Review creation failed: {e}")
 
     sys.exit(0)
 
