@@ -136,7 +136,9 @@ DO NOT suggest changes to:
 - Dates
 - Numeric values
 
-Use Indian English.
+Use American English.
+Check for grammar only in the "description" key, "short description" key
+Check for spelling mistakes throughout the document ignore the keys
 
 If no real issue → return []
 
