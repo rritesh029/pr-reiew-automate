@@ -33,10 +33,9 @@ if not pr_dict:
     sys.exit(0)
 
 pr_number = pr_dict["number"]
-pr_author = pr_dict["user"]["login"]
 
 
-# ---------------- DATE RULES (KEEP ORIGINAL) ----------------
+# ---------------- DATE RULES ----------------
 
 allowed_date_regex = re.compile(
     r'^(January|February|March|April|May|June|July|August|September|October|November|December) (?:[1-9]|[12][0-9]|3[01]), \d{4}$'
@@ -51,7 +50,7 @@ date_candidate_pattern = re.compile(
 )
 
 
-# ---------------- TODAY DATE ----------------
+# ---------------- TODAY ----------------
 
 today = datetime.utcnow()
 
@@ -87,36 +86,70 @@ def normalize_token(token):
     return token
 
 
-# ---------------- AI REVIEW (ONLY LANGUAGE) ----------------
+def extract_sentences(lines):
+    """
+    Extract only meaningful sentence-like string values from JSON lines
+    """
+    results = []
 
-def ai_review(content):
+    for i, line in enumerate(lines, start=1):
+
+        matches = re.findall(r':\s*"([^"]+)"', line)
+
+        for text in matches:
+
+            text = text.strip()
+
+            # Skip pure date tokens
+            if date_candidate_pattern.fullmatch(text):
+                continue
+
+            # Skip very small strings
+            if len(text) < 5:
+                continue
+
+            # Skip key-like / structured values
+            if ":" in text and len(text.split()) < 3:
+                continue
+
+            results.append((i, text))
+
+    return results
+
+
+# ---------------- AI REVIEW ----------------
+
+def ai_review(text):
 
     prompt = f"""
-You are a strict language reviewer.
+You are a strict grammar reviewer.
 
-Check ONLY for:
-1. Grammar mistakes
-2. Sentence issues
-3. Spelling issues
+ONLY check natural English sentences.
 
-Rules:
-- Use Indian English (colour, centre are correct)
-- DO NOT check dates
-- DO NOT modify numbers or dates
+STRICTLY IGNORE:
+- Dates (any format)
+- Numbers
+- JSON key-value pairs
+
+DO NOT suggest changes to:
+- Dates
+- Numeric values
+
+Use Indian English.
+
+If no real issue → return []
 
 Return ONLY JSON:
-
 [
   {{
-    "line": <line_number>,
-    "issue": "<grammar/spelling>",
-    "text": "<problem>",
-    "suggestion": "<fix>"
+    "issue": "grammar/spelling",
+    "text": "...",
+    "suggestion": "..."
   }}
 ]
 
-Content:
-\"\"\"{content}\"\"\"
+Text:
+\"\"\"{text}\"\"\"
 """
 
     response = client.chat.completions.create(
@@ -128,13 +161,20 @@ Content:
     output = response.choices[0].message.content
 
     try:
-        return json.loads(output)
+        data = json.loads(output)
     except:
         match = re.search(r'\[.*\]', output, re.DOTALL)
         if match:
-            return json.loads(match.group(0))
-        print("Invalid AI response:", output)
-        return []
+            data = json.loads(match.group(0))
+        else:
+            return []
+
+    clean = []
+    for item in data:
+        if item["text"].strip() != item["suggestion"].strip():
+            clean.append(item)
+
+    return clean
 
 
 # ---------------- PROCESS FILES ----------------
@@ -154,8 +194,6 @@ for f in files:
 
     print(f"Checking {filename}")
 
-    raw = ""
-
     try:
         content = repo.get_contents(filename, ref=pull.head.sha)
         raw = b64decode(content.content).decode("utf-8", errors="ignore")
@@ -166,17 +204,22 @@ for f in files:
     if not raw:
         continue
 
-    if filename not in violations:
-        violations[filename] = []
-
     lines = raw.splitlines()
+    violations[filename] = []
 
-    # ---------------- REGEX DATE VALIDATION ----------------
+    # ---------------- VALIDATE JSON (avoid duplicate garbage) ----------------
+
+    try:
+        json.loads(raw)
+    except Exception as e:
+        print(f"Skipping invalid JSON in {filename}: {e}")
+        continue
+
+    # ---------------- DATE VALIDATION ----------------
 
     for line_no, line in enumerate(lines, start=1):
 
         for match in date_candidate_pattern.finditer(line):
-
             token = normalize_token(match.group(0))
 
             if not allowed_date_regex.fullmatch(token):
@@ -197,39 +240,37 @@ for f in files:
 
     # ---------------- AI LANGUAGE VALIDATION ----------------
 
-    ai_issues = ai_review(raw)
+    sentences = extract_sentences(lines)
 
-    for issue in ai_issues:
-        line = issue.get("line", "?")
-        msg = issue.get("issue", "")
-        text = issue.get("text", "")
-        suggestion = issue.get("suggestion", "")
+    for line_no, text in sentences:
 
-        violations[filename].append(
-            f"LINE {line} : {msg} → `{text}` | Suggestion: `{suggestion}`"
-        )
+        issues = ai_review(text)
+
+        for issue in issues:
+            violations[filename].append(
+                f"LINE {line_no} : {issue['issue']} → `{issue['text']}` | Suggestion: `{issue['suggestion']}`"
+            )
 
 
 # ---------------- CREATE REVIEW ----------------
 
 if violations:
 
-    body_lines = []
-    body_lines.append("🤖Combined Review: Date + Language Issues\n")
+    body = ["🤖 Combined Review: Date + Language Issues\n"]
 
-    for file, errors in violations.items():
+    for file, errs in violations.items():
 
-        if not errors:
+        if not errs:
             continue
 
-        body_lines.append(f"{file.upper()}:")
+        body.append(f"{file.upper()}:")
 
-        for err in errors:
-            body_lines.append(err)
+        for e in errs:
+            body.append(e)
 
-        body_lines.append("")
+        body.append("")
 
-    review_body = "\n".join(body_lines)
+    review_body = "\n".join(body)
 
     try:
         pull.create_review(
@@ -239,7 +280,7 @@ if violations:
         print("Review created")
 
     except Exception as e:
-        print(f"Review creation failed: {e}")
+        print(f"Review failed: {e}")
 
     sys.exit(0)
 
