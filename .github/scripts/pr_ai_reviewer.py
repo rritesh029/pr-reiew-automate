@@ -88,7 +88,8 @@ def normalize_token(token):
 
 def extract_sentences(lines):
     """
-    Extract only meaningful sentence-like string values from JSON lines
+    Extract meaningful sentence-like string values from JSON lines
+    (works even if JSON is invalid)
     """
     results = []
 
@@ -104,11 +105,11 @@ def extract_sentences(lines):
             if date_candidate_pattern.fullmatch(text):
                 continue
 
-            # Skip very small strings
+            # Skip too small strings
             if len(text) < 5:
                 continue
 
-            # Skip key-like / structured values
+            # Skip structured-like content
             if ":" in text and len(text.split()) < 3:
                 continue
 
@@ -207,13 +208,15 @@ for f in files:
     lines = raw.splitlines()
     violations[filename] = []
 
-    # ---------------- VALIDATE JSON (avoid duplicate garbage) ----------------
+    # ---------------- JSON VALIDATION (NON-BLOCKING) ----------------
 
+    is_valid_json = True
     try:
         json.loads(raw)
     except Exception as e:
-        print(f"Skipping invalid JSON in {filename}: {e}")
-        continue
+        print(f"Invalid JSON in {filename}: {e}")
+        is_valid_json = False
+        violations[filename].append("⚠️ File contains invalid JSON structure")
 
     # ---------------- DATE VALIDATION ----------------
 
