@@ -137,10 +137,6 @@ DO NOT suggest changes to:
 - Numeric values
 
 Use American English.
-Check for grammar only in the "description" key, "short description" key.
-Check for spelling mistakes throughout the document ignore the keys.
-Read the entire sentence before checking for grammar mistakes. Eg: This is a center point. Don't just read center point and suggest: center point is not a grammatically correct phrase; it should be 'center point' or 'the center point'.
-First point out the incorrect sentence then correct it, enclosed the corrected sections in snippet. Eg: The color of sky is blue. Suggestion: The color of the sky is blue (added article 'the' for clarity) make 'of the sky' inside the snippet format.
 
 If no real issue → return []
 
