@@ -1,6 +1,59 @@
 {
   "apiInfo": {
     "name": "Test API",
+    "description": "Testing date validation script", 
+    "lastUpdate": "January 1, 2024"
+  },
+
+  "validExample": {
+    "lastUpdate": "March 17, 2026"
+  },
+
+  "invalidDateFormat": {
+    "releaseDate": "March 01, 2026"
+  },
+
+  "abbreviatedMonth": {
+    "releaseDate": "Mar 1, 2026"
+  },
+
+  "incorrectDayZero": {
+    "releaseDate": "November 01, 2025"
+  },
+
+  "nestedStructure": {
+    "metadata": {
+      "x-modified": "March 1, 2025"
+    }
+  },
+
+  "arrayObjects": [
+    {
+      "name": "serviceA",
+      "lastUpdate": "March 10, 2026"
+    },
+    {
+      "name": "serviceB",
+      "x-modified": "March 5, 2024"
+    }
+  ],
+
+  "deepNested": {
+    "level1": {
+      "level2": {
+        "level3": {
+          "x-modified": "February 10, 2026"
+        }
+      }
+    }
+  },
+
+  "correctCaseExample": {
+    "releaseDate": "November 5, 2025"
+  }
+  {
+  "apiInfo": {
+    "name": "Test API",
     "description": "Testing date validation script",
     "lastUpdate": "January 1, 2024"
   },
@@ -51,4 +104,15 @@
   "correctCaseExample": {
     "releaseDate": "November 5, 2025"
   }
+  {
+  "content": [
+    { "text": "Ram a boy" },
+    { "text": "She go to school" },
+    { "text": "The color of sky is blue" },
+    { "text": "The organisation is located in center" },
+    { "text": "Date: 2024/12/01" },
+    { "text": "Date: 01-13-2024" },
+    { "text": "He eating food" },
+    { "text": "This is a center point" }
+  ]
 }
