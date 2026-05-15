@@ -1,31 +1,4 @@
-# Extensive Test Dataset for `scan_pii_data()`
 
-This document contains:
-
-* VALID cases
-* INVALID cases
-* False-positive prevention cases
-* Structured PII traversal cases
-* Non-structured PII cases
-* Edge cases
-* Nested recursion cases
-
-The goal is to validate:
-
-* Case 1
-* Case 2
-* Case 3
-* Allowed values
-* Regex matching
-* Context ownership
-* No accidental descendant propagation
-* No arbitrary metadata-triggering
-
----
-
-# FULL TEST JSON
-
-```json
 {
   "direct_case_1": {
     "valid_phone_number": "(000) 000-0000",
