@@ -3099,7 +3099,7 @@
                 "required": true,
                 "validation": "&le;3 characters",
                 "data_type": "string",
-                "description": "The country code of the corresponding Client phone number, not applicable for some countries.",
+                "description": "The country code of the corresponding Client number, not applicable for some countries.",
                 "example": "1"
               },
               {
