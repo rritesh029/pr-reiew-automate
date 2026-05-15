@@ -1,35 +1,82 @@
-name: AI PR Reviewer (Groq)
+name: PR Reviewer bot
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened, synchronize, ready_for_review]
 
 permissions:
   contents: read
   pull-requests: write
+  issues: write
+
+concurrency:
+  group: pr-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
-  ai-review:
-    runs-on: ubuntu-latest
-
+  pr-auto-check:
+    if: ${{ (github.event.pull_request.draft == false || github.event.action == 'synchronize') && !contains(github.event.pull_request.labels.*.name, 'skip-review') }}
+    runs-on: aexp-ubuntu-22.04-medium
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install PyGithub openai
+        run: pip install PyGithub pyyaml
 
-      - name: Run AI Reviewer
+      - name: Run PR auto reviewer
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          QUIET_PERIOD_MINUTES: 1
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           GITHUB_EVENT_PATH: ${{ github.event_path }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: python .github/scripts/pr_ai_reviewer.py
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_API_URL: ${{ github.api_url }}
+        run: python scripts/pr_reviewer.py
+
+      - name: Debug (before success notification)
+        if: success()
+        run: |
+          echo "Job succeeded, preparing to send Slack notification"
+          echo "Channel: ${{ vars.PR_REVIEW_WORKFLOW_NOIFICATION_CHANNEL }}"
+          echo "Repo: ${{ github.repository }}"
+          echo "PR: ${{ github.event.pull_request.number }}"
+          echo "Actor: ${{ github.actor }}"
+
+      - name: Slack notification (success)
+        if: success()
+        uses: amex-eng/github-actions-slack@main
+        with:
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+          slack-channel: ${{ vars.PR_REVIEW_WORKFLOW_NOIFICATION_CHANNEL }}
+          slack-text: |
+            Hi @${{ github.actor }}, Your PR <${{ github.event.pull_request.html_url }}|#${{ github.event.pull_request.number }}> is awaiting corrections.
+
+      - name: Debug (before failure notification)
+        if: failure()
+        run: |
+          echo "Job failed, preparing to send Slack notification"
+          echo "Channel: ${{ vars.PR_REVIEW_WORKFLOW_NOIFICATION_CHANNEL }}"
+          echo "Repo: ${{ github.repository }}"
+          echo "PR: ${{ github.event.pull_request.number }}"
+          echo "Actor: ${{ github.actor }}"
+
+      - name: Slack notification (failure)
+        if: failure()
+        uses: amex-eng/github-actions-slack@main
+        with:
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+          slack-channel: ${{ vars.PR_REVIEW_WORKFLOW_NOIFICATION_CHANNEL }}
+          slack-text: |
+            :x: PR Reviewer bot | FAILED
+            Repository: `${{ github.repository }}`
+            PR: #${{ github.event.pull_request.number }}
+            Actor: `${{ github.actor }}`
+            <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>
