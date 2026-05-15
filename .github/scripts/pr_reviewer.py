@@ -333,8 +333,8 @@ SENSITIVE_FIELD_RULES = {
         "suggested_fix": "EPQY2I6OK38NBKM",
     },
     "phone_number": {
-        "key_re": re.compile(r"(?i)^(?!.*(?:last|first).*phone[_\s-]*number).*phone[_\s-]*number"),
-        "hint_re": re.compile(r"(?i)^(?!.*(?:last|first).*phone[_\s-]*number).*phone[_\s-]*number"),
+        "key_re": re.compile(r"(?i)^(?!.*(?:last|first).*phone[_\s-]*number).*phone[_\s-]*"),
+        "hint_re": re.compile(r"(?i)^(?!.*(?:last|first).*phone[_\s-]*number).*phone[_\s-]*"),
         "allowed": {"(000) 000-0000", "(555) 555-1111", "(555) 555-2222"},
         "message": "Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222",
         "suggested_fix": "(000) 000-0000",
