@@ -3113,7 +3113,7 @@
                 "required": true,
                 "data_type": "string",
                 "description": "The phone number of the Client.",
-                "example": "5555551111"
+                "example": "(555) 555-2222"
               },
               {
                 "title": "extension",
@@ -4278,7 +4278,7 @@
         "description": "An OAuth2 Bearer token that consumers use to gain access to the American Express API. The value passed here is the response of Access Token API. See the Authorization section for more details.",
         "required": true,
         "data_type": "string",
-        "example": "TBD"
+        "example": "00000000-d8v7-262f-33ot-9vh35dsj8x8m"
       },
       "date": {
         "title": "Date",
