@@ -4336,4 +4336,74 @@
       }
     }
   }
+
+,
+"intentional_validation_test_cases": {
+  "case1_direct_sensitive_field": {
+    "ssn": "111111111"
+  },
+
+  "case2a_structured_pii_title_number_example": {
+    "phone_number": {
+      "children": [
+        {
+          "title": "number",
+          "example": "INVALID_PHONE"
+        }
+      ]
+    }
+  },
+
+  "case2b_structured_pii_immediate_number": {
+    "phone_number": {
+      "number": "abcd"
+    }
+  },
+
+  "case3a_title_contains_structured_pii": {
+    "title": "phone_number",
+    "children": [
+      {
+        "title": "number",
+        "example": "WRONG"
+      }
+    ]
+  },
+
+  "case3b_title_contains_structured_pii_immediate_number": {
+    "title": "phone_number",
+    "number": "123"
+  },
+
+  "case6_other_pii_direct": {
+    "email": {
+      "example": "wrong_email"
+    }
+  },
+
+  "case7_other_pii_title_only": {
+    "title": "first_name",
+    "example": "123456"
+  },
+
+  "case8_should_not_flag": {
+    "description": "first_name",
+    "example": "123456"
+  },
+
+  "case9_regression_false_positive": {
+    "phone": {
+      "countryCode": "1",
+      "areaCode": "555",
+      "extension": "1111"
+    }
+  },
+
+  "case10_valid_structured_example": {
+    "phone_number": {
+      "number": "(555) 555-1111"
+    }
+  }
+}
+
 }
