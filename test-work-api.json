@@ -1,7 +1,7 @@
 {
   "version": 0,
   "header": {
-    "title": "@ Work APIs",
+    "title": "@ Work API",
     "urn": "nextgen-at-work-apis-v1",
     "versions": [
       "Version_1.0.0"
