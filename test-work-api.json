@@ -152,8 +152,8 @@
                         "line3": "4th floor",
                         "city": "Phoenix",
                         "state": "AZ",
-                        "country": "USA123",
-                        "postalCode": "12"
+                        "country": "U.S.",
+                        "postalCode": "12345"
                       },
                       {
                         "type": "WORK",
@@ -169,22 +169,22 @@
                     "email": [
                       {
                         "type": "WORK",
-                        "address": "someoneexample.com"
+                        "address": "wrong-email"
                       }
                     ],
-                    "dateOfBirth": "1999/05/24",
+                    "dateOfBirth": "1999-05-24",
                     "phone": [
                       {
                         "type": "HOME",
-                        "countryCode": "1",
-                        "areaCode": "555",
-                        "number": "5555551111",
-                        "extension": "1111"
+                        "countryCode": "99999",
+                        "areaCode": "12",
+                        "number": "abcd1234",
+                        "extension": "abcd"
                       }
                     ],
                     "governmentId": {
                       "type": "SOCIAL_SECURITY_NUMBER",
-                      "value": "123456789ABC",
+                      "value": "12",
                       "countryOfIssuance": "U.S.",
                       "dateOfIssuance": "2022-02-20",
                       "dateOfExpiry": "2027-02-20"
@@ -207,7 +207,7 @@
                     "phone": {
                       "countryCode": "1",
                       "areaCode": "555",
-                      "number": "(555) 5551111",
+                      "number": "999",
                       "extension": "1111"
                     }
                   },
@@ -367,10 +367,10 @@
               "cards": [
                 {
                   "searchParameters": {
-                    "accountNumber": "3742ABC00000004"
+                    "accountNumber": "374200000000004"
                   },
-                  "status": "CANCELLED_INVALID",
-                  "statusEffectiveDate": "01-02-2022",
+                  "status": "CANCELED",
+                  "statusEffectiveDate": "2022-02-01",
                   "statusChangeReason": "LEFT_COMPANY"
                 }
               ]
@@ -616,7 +616,7 @@
                 {
                   "searchParameters": {
                     "member": {
-                      "employeeId": ""
+                      "employeeId": "12345"
                     }
                   },
                   "status": "CANCELED",
