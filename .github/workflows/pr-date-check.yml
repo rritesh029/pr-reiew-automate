@@ -16,7 +16,7 @@ concurrency:
 jobs:
   pr-auto-check:
     if: ${{ (github.event.pull_request.draft == false || github.event.action == 'synchronize') && !contains(github.event.pull_request.labels.*.name, 'skip-review') }}
-    runs-on: aexp-ubuntu-22.04-medium
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
