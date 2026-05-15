@@ -393,15 +393,7 @@
     }
   }
 }
-```
 
----
-
-# EXPECTED FALSE POSITIVE PREVENTION
-
-These MUST NOT be flagged:
-
-```json
 {
   "title": "phone",
   "titleDescription": "The contact phone number for the Client.",
@@ -412,19 +404,7 @@ These MUST NOT be flagged:
     }
   ]
 }
-```
 
-Reason:
-
-* `title != phone_number`
-* child title != number
-* description/titleDescription must NOT establish PII context anymore.
-
----
-
-# EXPECTED VALID STRUCTURED MATCH
-
-```json
 {
   "title": "phone_number",
   "children": [
@@ -434,41 +414,17 @@ Reason:
     }
   ]
 }
-```
 
-Reason:
 
-* title establishes phone_number context
-* child title == number
-* example validated.
 
----
-
-# EXPECTED VALID OTHER-PII MATCH
-
-```json
 {
   "title": "email",
   "example": "real@gmail.com"
 }
-```
 
-Reason:
 
-* title establishes email context
-* example validated.
-
----
-
-# EXPECTED NON-TRIGGER
-
-```json
 {
   "description": "customer email",
   "example": "real@gmail.com"
 }
 ```
-
-Reason:
-
-* description must NOT establish pii context anymore.
