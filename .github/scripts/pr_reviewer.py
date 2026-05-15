@@ -316,7 +316,7 @@ SENSITIVE_FIELD_RULES = {
         "hint_re": re.compile(r"(?i)^(?!.*(?:last|first).*access[_\s-]*token).*access[_\s-]*token"),
         "allowed": {"00000000-d8v7-262f-33ot-9vh35dsj8x8m", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"},
         "message": "Access Token example must be one of 00000000-d8v7-262f-33ot-9vh35dsj8x8m, xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-        "suggested_fix": "00000000",
+        "suggested_fix": "00000000-d8v7-262f-33ot-9vh35dsj8x8m",
     },
     "refresh_token": {
         "key_re": re.compile(r"(?i)^(?!.*(?:last|first).*refresh[_\s-]*token).*refresh[_\s-]*token"),
