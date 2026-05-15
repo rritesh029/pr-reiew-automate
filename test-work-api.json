@@ -152,8 +152,8 @@
                         "line3": "4th floor",
                         "city": "Phoenix",
                         "state": "AZ",
-                        "country": "U.S.",
-                        "postalCode": "12345"
+                        "country": "USA123",
+                        "postalCode": "12"
                       },
                       {
                         "type": "WORK",
@@ -169,10 +169,10 @@
                     "email": [
                       {
                         "type": "WORK",
-                        "address": "someone@example.com"
+                        "address": "someoneexample.com"
                       }
                     ],
-                    "dateOfBirth": "1999-05-24",
+                    "dateOfBirth": "1999/05/24",
                     "phone": [
                       {
                         "type": "HOME",
@@ -184,7 +184,7 @@
                     ],
                     "governmentId": {
                       "type": "SOCIAL_SECURITY_NUMBER",
-                      "value": "123-45-6789",
+                      "value": "123456789ABC",
                       "countryOfIssuance": "U.S.",
                       "dateOfIssuance": "2022-02-20",
                       "dateOfExpiry": "2027-02-20"
@@ -367,10 +367,10 @@
               "cards": [
                 {
                   "searchParameters": {
-                    "accountNumber": "374200000000004"
+                    "accountNumber": "3742ABC00000004"
                   },
-                  "status": "CANCELED",
-                  "statusEffectiveDate": "2022-02-01",
+                  "status": "CANCELLED_INVALID",
+                  "statusEffectiveDate": "01-02-2022",
                   "statusChangeReason": "LEFT_COMPANY"
                 }
               ]
@@ -616,7 +616,7 @@
                 {
                   "searchParameters": {
                     "member": {
-                      "employeeId": "12345"
+                      "employeeId": ""
                     }
                   },
                   "status": "CANCELED",
