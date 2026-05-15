@@ -1474,13 +1474,35 @@ class JsonPrScanner:
 
         walk(parsed, [])
     ##########################
-    def scan_pii_data(self, parsed: Any, raw: str, filename: str, violations: list[Violation], key_index: Optional[dict[tuple[str, ...], list[int]]] = None,) -> None:
-        def flag_violation(example_value: Any, parent_path: list[str], rule_name: str, key_name: str) -> None:
+    def scan_pii_data(
+        self,
+        parsed: Any,
+        raw: str,
+        filename: str,
+        violations: list[Violation],
+        key_index: Optional[dict[tuple[str, ...], list[int]]] = None,
+    ) -> None:
+    
+        STRUCTURED_PII_RULES = {
+            "phone_number",
+            "card_number",
+            "ssn",
+            "iban",
+        }
+    
+        def flag_violation(
+            example_value: Any,
+            parent_path: list[str],
+            rule_name: str,
+            key_name: str,
+        ) -> None:
             rule = SENSITIVE_FIELD_RULES[rule_name]
+    
             cleaned = str(example_value).strip()
+    
             if cleaned in rule["allowed"]:
                 return
-
+    
             line_no, line_numbers, _ = self.resolve_line_number(
                 raw,
                 path=parent_path,
@@ -1488,6 +1510,7 @@ class JsonPrScanner:
                 value=str(example_value),
                 key_index=key_index,
             )
+    
             self.add_violation(
                 violations,
                 filename,
@@ -1498,47 +1521,205 @@ class JsonPrScanner:
                 lines=line_numbers,
                 fingerprint=f"{rule_name}:{'.'.join(parent_path + [key_name])}",
             )
-
+    
+        def matches_sensitive_key(text: str, rule: dict) -> bool:
+            return bool(rule["key_re"].search(text))
+    
+        def matches_title_context(obj: dict, rule: dict) -> bool:
+            title_val = obj.get("title")
+    
+            if not isinstance(title_val, str):
+                return False
+    
+            return bool(rule["hint_re"].search(title_val.strip()))
+    
+        def validate_structured_descendants(
+            node: Any,
+            pii_rule_name: str,
+            current_path: list[str],
+        ) -> None:
+    
+            rule = SENSITIVE_FIELD_RULES[pii_rule_name]
+    
+            if isinstance(node, dict):
+    
+                # --------------------------------------------
+                # CASE:
+                # {
+                #   "title": "number",
+                #   "example": "..."
+                # }
+                # --------------------------------------------
+                title_val = node.get("title")
+                example_val = node.get("example")
+    
+                if (
+                    isinstance(title_val, str)
+                    and title_val.strip().lower() == "number"
+                    and example_val is not None
+                ):
+                    flag_violation(
+                        example_val,
+                        current_path,
+                        pii_rule_name,
+                        "example",
+                    )
+    
+                # --------------------------------------------
+                # CASE:
+                # {
+                #   "number": "..."
+                # }
+                # --------------------------------------------
+                number_val = node.get("number")
+    
+                if number_val is not None and not isinstance(number_val, (dict, list)):
+                    flag_violation(
+                        number_val,
+                        current_path,
+                        pii_rule_name,
+                        "number",
+                    )
+    
+                for k, v in node.items():
+                    validate_structured_descendants(
+                        v,
+                        pii_rule_name,
+                        current_path + [str(k)],
+                    )
+    
+            elif isinstance(node, list):
+    
+                for idx, item in enumerate(node):
+                    validate_structured_descendants(
+                        item,
+                        pii_rule_name,
+                        current_path + [f"[{idx}]"],
+                    )
+    
         def walk(obj: Any, path: list[str]) -> None:
+    
+            # =========================================================
+            # DICT
+            # =========================================================
             if isinstance(obj, dict):
+    
+                # =====================================================
+                # CASE 1 + CASE 2
+                # Sensitive KEY itself
+                # =====================================================
                 for key, val in obj.items():
+    
                     key_text = str(key).strip().lower().replace(" ", "_")
-
+    
                     for rule_name, rule in SENSITIVE_FIELD_RULES.items():
-                        if not rule["key_re"].search(key_text):
+    
+                        if not matches_sensitive_key(key_text, rule):
                             continue
-
-                        child_path = path + [str(key)]
-
-                        if isinstance(val, dict):
-                            if "example" in val:
-                                flag_violation(val.get("example"), child_path, rule_name, "example")
-                        elif isinstance(val, list):
-                            continue
-                        elif val is not None:
-                            flag_violation(val, path, rule_name, str(key))
-
-                if "example" in obj:
-                    for rule_name, rule in SENSITIVE_FIELD_RULES.items():
-                        matched_context = False
-                        for key, val in obj.items():
-                            key_text = str(key).strip().lower().replace(" ", "_")
-                            if rule["key_re"].search(key_text):
-                                matched_context = True
-                                break
-                            if isinstance(val, str) and rule["hint_re"].search(val.strip()):
-                                matched_context = True
-                                break
-                        if matched_context:
-                            flag_violation(obj.get("example"), path, rule_name, "example")
-
+    
+                        # ============================================
+                        # STRUCTURED PII
+                        # phone_number / card_number / ssn / iban
+                        # ============================================
+                        if rule_name in STRUCTURED_PII_RULES:
+    
+                            # ----------------------------------------
+                            # CASE 1
+                            # {
+                            #   "phone_number": "..."
+                            # }
+                            # ----------------------------------------
+                            if not isinstance(val, (dict, list)):
+                                flag_violation(
+                                    val,
+                                    path,
+                                    rule_name,
+                                    str(key),
+                                )
+    
+                            # ----------------------------------------
+                            # CASE 2
+                            # Structured traversal
+                            # ----------------------------------------
+                            else:
+                                validate_structured_descendants(
+                                    val,
+                                    rule_name,
+                                    path + [str(key)],
+                                )
+    
+                        # ============================================
+                        # OTHER PII TYPES
+                        # ============================================
+                        else:
+    
+                            # ----------------------------------------
+                            # CASE 1
+                            # ----------------------------------------
+                            if not isinstance(val, (dict, list)):
+                                flag_violation(
+                                    val,
+                                    path,
+                                    rule_name,
+                                    str(key),
+                                )
+    
+                            # ----------------------------------------
+                            # CASE 2
+                            # ----------------------------------------
+                            elif isinstance(val, dict) and "example" in val:
+                                flag_violation(
+                                    val.get("example"),
+                                    path + [str(key)],
+                                    rule_name,
+                                    "example",
+                                )
+    
+                # =====================================================
+                # CASE 3
+                # ONLY title value can establish context now
+                # =====================================================
+                for rule_name, rule in SENSITIVE_FIELD_RULES.items():
+    
+                    if not matches_title_context(obj, rule):
+                        continue
+    
+                    # ================================================
+                    # STRUCTURED PII
+                    # ================================================
+                    if rule_name in STRUCTURED_PII_RULES:
+    
+                        validate_structured_descendants(
+                            obj,
+                            rule_name,
+                            path,
+                        )
+    
+                    # ================================================
+                    # OTHER PII TYPES
+                    # ================================================
+                    else:
+    
+                        if "example" in obj:
+                            flag_violation(
+                                obj.get("example"),
+                                path,
+                                rule_name,
+                                "example",
+                            )
+    
+                # continue recursion
                 for key, val in obj.items():
                     walk(val, path + [str(key)])
-
+    
+            # =========================================================
+            # LIST
+            # =========================================================
             elif isinstance(obj, list):
+    
                 for idx, item in enumerate(obj):
                     walk(item, path + [f"[{idx}]"])
-
+    
         walk(parsed, [])
     #############################
 
