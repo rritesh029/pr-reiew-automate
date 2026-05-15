@@ -394,7 +394,7 @@
   }
 }
 
-{
+
   "title": "phone",
   "titleDescription": "The contact phone number for the Client.",
   "children": [
