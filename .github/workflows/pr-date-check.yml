@@ -39,4 +39,4 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_API_URL: ${{ github.api_url }}
-        run: python .github/scripts/pr_ai_reviewer.py
+        run: python .github/scripts/pr_reviewer.py
