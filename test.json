@@ -1,54 +1,4367 @@
+
+
+File Name: nextgen-at-work-apis-specification.json
+
+LINE 3103: 1 -> (000) 000-0000 - Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222 - ye county code hai phone number nahi
+
+LINE 3109: 555 -> (000) 000-0000 - Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222 (ye area code hai phone number nahi)
+
+LINE 3116: 5555551111 -> (000) 000-0000 - Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222 ye sahi flagged hai
+
+LINE 3122: 1111 -> (000) 000-0000 - Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222 (ye extension hai phone number nahi)
+
+LINE 3138: SOCIAL_SECURITY_NUMBER -> 219-09-9999 - SSN example must be one of 123-45-6789, 078-05-1120, 219-09-9999, 123-12-1234, 111-11-1111, 222-22-2222, 333-33-3333, 444-44-4444, 555-55-555 (ye governament id type hai phone number nahi)
+
+LINE 3272: HOME -> (000) 000-0000 - Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222 (ye phone type hai , phone number nahi)
+
+LINE 3283: 1 -> (000) 000-0000 - Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222 (ye county code hai phone number nahi )
+
+LINE 3289: 555 -> (000) 000-0000 - Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222 (ye area code hai phone number nahi)
+
+LINE 3296: (555) 555-1111 -> (000) 000-0000 - Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222 ye q flagged kiya hai ?(555) 555-1111 allowed hai why forcing to use just (000) 000-0000
+
+LINE 3302: 1111 -> (000) 000-0000 - Phone Number example must be one of (000) 000-0000, (555) 555-1111 or (555) 555-2222 (ye extension hai phone number nahi)
+
+LINE 3393: WORK -> someone@example.com - Email example must be someone@example.com. (ye email type haie , email address nahi)
+
+LINE 4281: TBD -> 00000000 - Access Token example must be one of 00000000-d8v7-262f-33ot-9vh35dsj8x8m, xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (ye sahi flagged hia but reason kya hai, kis case k under ye flagged hua hai)
+
 {
-  "apiInfo": {
-    "name": "Test API",
-    "description": "Testing date validation script",
-    "lastUpdate": "January 1, 2024"
+  "version": 0,
+  "header": {
+    "title": "@ Work APIs",
+    "urn": "nextgen-at-work-apis-v1",
+    "versions": [
+      "Version_1.0.0"
+    ],
+    "lastUpdated": "May 14, 2026"
   },
-
-  "validExample": {
-    "lastUpdate": "March 17, 2026"
+  "leftNav": {
+    "Version_1.0.0": [
+      {
+        "sectionTitle": "Resources",
+        "section": [
+          {
+            "title": "Authorization",
+            "link": "/auth",
+            "left_icon": "dls-icon-fraud-protection"
+          },
+          {
+            "title": "Errors",
+            "link": "/errors",
+            "left_icon": "dls-icon-warning"
+          }
+        ]
+      },
+      {
+        "sectionTitle": "API References",
+        "section": [
+          {
+            "title": "Headers",
+            "link": "/headers"
+          },
+          {
+            "title": "Apply for Card API",
+            "children": [
+              {
+                "title": "Initiate Application",
+                "link": "apply"
+              }
+            ]
+          },
+          {
+            "title": "Card Update Status API (Cancel)",
+            "children": [
+              {
+                "title": "By Account Number",
+                "link": "statusUpdate"
+              },
+              {
+                "title": "By Employee ID",
+                "link": "statusUpdate2"
+              }
+            ]
+          },
+          {
+            "title": "Card Member Demographics Update API",
+            "children": [
+              {
+                "title": "By Account Number",
+                "link": "billingAddressUpdate"
+              },
+              {
+                "title": "By Employee ID",
+                "link": "billingAddressUpdate2"
+              }
+            ]
+          },
+          {
+            "title": "Card Member Accounting Information Update API",
+            "children": [
+              {
+                "title": "By Account Number",
+                "link": "accountingInformationUpdate"
+              },
+              {
+                "title": "By Employee ID",
+                "link": "accountingInformationUpdate2"
+              }
+            ]
+          },
+          {
+            "title": "Get Application Details API",
+            "children": [
+              {
+                "title": "By Application ID",
+                "link": "getApplicationDetails"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
-
-  "invalidDateFormat": {
-    "releaseDate": "March 01, 2026"
-  },
-
-  "abbreviatedMonth": {
-    "releaseDate": "Mar 1, 2026"
-  },
-
-  "incorrectDayZero": {
-    "releaseDate": "November 01, 2025"
-  },
-
-  "nestedStructure": {
-    "metadata": {
-      "x-modified": "March 1, 2025"
+  "overview": {
+    "Version_1.0.0": {
+      "title": "Overview",
+      "description": "The <b>@ Work APIs</b> provide a suite of REST APIs that enable system-to-system communication between a Corporate Client's Enterprise Resource Planning (ERP) and American Express<sup>&reg;</sup> to automate the common American Express @ Work functionality. The communication between these systems automates the changes made in the Client's ERP, which triggers changes to the American Express Corporate Card program. The <b>@ Work APIs</b> improve efficiency and security through automation, delivering increased program control, faster response time, and cost savings to a Client's Corporate Card program. The <b>@ Work APIs</b> enable Clients to execute Card status update requests as well as Apply For Card requests through their in-house ERP systems.",
+      "endpoints": [
+        {
+          "endpoint": "POST/cards/applications"
+        },
+        {
+          "endpoint": "PATCH/cards/status"
+        },
+        {
+          "endpoint": "PATCH/card_members/demographics"
+        },
+        {
+          "endpoint": "PATCH/card_members/accounting_information"
+        },
+        {
+          "endpoint": "GET/corporate-cards/cards/applications/{applicationId}"
+        }
+      ]
     }
   },
-
-  "arrayObjects": [
-    {
-      "name": "serviceA",
-      "lastUpdate": "March 10, 2026"
-    },
-    {
-      "name": "serviceB",
-      "x-modified": "March 5, 2024"
-    }
-  ],
-
-  "deepNested": {
-    "level1": {
-      "level2": {
-        "level3": {
-          "x-modified": "February 10, 2026"
+  "content": {
+    "Version_1.0.0": {
+      "apply": {
+        "title": "Corporate Card Management: Initiate a Corporate Card Application",
+        "method": "POST",
+        "media_type": "application/json",
+        "description": "The <b>@ Work Apply for Card API</b> is an endpoint that initiates a Corporate Card Application, and is applicable for American Express Clients utilizing the <samp>Quick Send</samp> functionality. This endpoint is available in the following markets: United States, United Kingdom, Australia, Mexico, India, Singapore, Italy, and Japan, in addition to International Euro Card and Global Dollar Card markets.",
+        "server_host": {
+          "host": "https://api.qasb2s.americanexpress.com/commercial/v1/corporate-cards/cards/applications"
+        },
+        "endpoint": "POST/cards/applications",
+        "request": {
+          "header": {
+            "title": "Request",
+            "types": [
+              "json"
+            ]
+          },
+          "body": {
+            "json": {
+              "applications": [
+                {
+                  "applicant": {
+                    "name": {
+                      "first": "John",
+                      "middle": "M",
+                      "last": "Jones"
+                    },
+                    "address": [
+                      {
+                        "type": "HOME",
+                        "line1": "100 Elm Street",
+                        "line2": "Suite A",
+                        "line3": "4th floor",
+                        "city": "Phoenix",
+                        "state": "AZ",
+                        "country": "U.S.",
+                        "postalCode": "12345"
+                      },
+                      {
+                        "type": "WORK",
+                        "line1": "200 Oak Street",
+                        "line2": "Suite B",
+                        "line3": "4th floor",
+                        "city": "New York",
+                        "state": "NY",
+                        "country": "U.S.",
+                        "postalCode": "12345"
+                      }
+                    ],
+                    "email": [
+                      {
+                        "type": "WORK",
+                        "address": "someone@example.com"
+                      }
+                    ],
+                    "dateOfBirth": "1999-05-24",
+                    "phone": [
+                      {
+                        "type": "HOME",
+                        "countryCode": "1",
+                        "areaCode": "555",
+                        "number": "5555551111",
+                        "extension": "1111"
+                      }
+                    ],
+                    "governmentId": {
+                      "type": "SOCIAL_SECURITY_NUMBER",
+                      "value": "123-45-6789",
+                      "countryOfIssuance": "U.S.",
+                      "dateOfIssuance": "2022-02-20",
+                      "dateOfExpiry": "2027-02-20"
+                    },
+                    "accountingInformation": {
+                      "employeeId": "1234567890",
+                      "costCenter": "1234567890",
+                      "universalId": "1234512345123451234512345"
+                    }
+                  },
+                  "isRushCard": true,
+                  "account": {
+                    "type": "BASIC_CONTROL_ACCOUNT",
+                    "id": "1220000000000032"
+                  },
+                  "product": {
+                    "type": "GREEN"
+                  },
+                  "company": {
+                    "phone": {
+                      "countryCode": "1",
+                      "areaCode": "555",
+                      "number": "(555) 5551111",
+                      "extension": "1111"
+                    }
+                  },
+                  "formEdits": [
+                    {
+                      "fieldName": "accountingInformation.employeeId",
+                      "isEditable": true
+                    },
+                    {
+                      "fieldName": "accountingInformation.costCenter",
+                      "isEditable": true
+                    },
+                    {
+                      "fieldName": "accountingInformation.universalId",
+                      "isEditable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "response": [
+          {
+            "value": {
+              "applications": [
+                {
+                  "applicationId": "US-7376323",
+                  "status": "APPLICATION_INITIATED"
+                }
+              ]
+            }
+          }
+        ],
+        "request_parameter_description": {
+          "applications": {
+            "$ref": "#/components/schemas/applications"
+          }
+        },
+        "status_codes": {
+          "200": {
+            "status_type": "Successful response",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "applications": {
+                "$ref": "#/components/schemas/applyCardResponse"
+              }
+            }
+          },
+          "400": {
+            "status_type": "Bad request",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_apply_4xx"
+              }
+            }
+          },
+          "401": {
+            "status_type": "Unauthorized",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/401_error_apply"
+              }
+            }
+          },
+          "403": {
+            "status_type": "Unauthenticated",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "error": {
+                "$ref": "#/components/schemas/403_errors"
+              }
+            }
+          },
+          "500": {
+            "status_type": "Internal server error",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_apply_5xx"
+              }
+            }
+          },
+          "504": {
+            "status_type": "Gateway timeout",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/504_errors_apply"
+              }
+            }
+          }
+        }
+      },
+      "statusUpdate": {
+        "title": "Corporate Card Management: Update a Corporate Card's Status by Account Number",
+        "method": "PATCH",
+        "media_type": "application/json",
+        "description": "<p>The <b>@ Work Corporate Card Status Update API</b> is responsible for handling requests to update the status of a Corporate Card, Corporate Purchasing Card (CPC), or Corporate Meeting Card (CMC). This API currently supports the Cancel Card transaction.<ul class='pad-3-l'><li>The immediate Cancel Card transaction is available in the following markets: United States, United Kingdom, Australia, Canada, France, Hong Kong, Argentina, Germany, Singapore, Mexico, Italy, India, Spain, New Zealand, Austria, Netherlands, Sweden, Norway, Denmark, and Japan, in addition to International Euro Card and Global Dollar Card markets.</li><li>The future Cancel Card transaction is available in the following markets: United States, United Kingdom, Australia, Canada, France, Hong Kong, Germany, Singapore, Mexico, Italy, India, Spain, New Zealand, and Netherlands, in addition to Global Dollar Card market.</li></ul></p>",
+        "server_host": {
+          "host": "https://api.qasb2s.americanexpress.com/commercial/v1/corporate-cards/cards/status"
+        },
+        "endpoint": "PATCH/cards/status",
+        "request": {
+          "header": {
+            "title": "Request",
+            "types": [
+              "json"
+            ]
+          },
+          "body": {
+            "json": {
+              "cards": [
+                {
+                  "searchParameters": {
+                    "accountNumber": "374200000000004"
+                  },
+                  "status": "CANCELED",
+                  "statusEffectiveDate": "2022-02-01",
+                  "statusChangeReason": "LEFT_COMPANY"
+                }
+              ]
+            }
+          }
+        },
+        "response": [
+          {
+            "value": {
+              "cards": [
+                {
+                  "searchParameters": {
+                    "accountNumber": "374200000000004"
+                  },
+                  "status": "CANCELED",
+                  "processId": "1234567",
+                  "lastFive": "00004"
+                }
+              ]
+            }
+          }
+        ],
+        "request_parameter_description": {
+          "cards": {
+            "$ref": "#/components/schemas/cards"
+          }
+        },
+        "status_codes": {
+          "200": {
+            "status_type": "Successful response",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "cards": {
+                "title": "cards",
+                "data_type": "array of objects",
+                "required": true,
+                "$ref": "#/components/schemas/updateStatusResponse_200"
+              }
+            }
+          },
+          "207": {
+            "status_type": "Multi-status",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "cards": {
+                "title": "cards",
+                "data_type": "array of objects",
+                "children": [
+                  {
+                    "title": "searchParameters",
+                    "required": true,
+                    "data_type": "object",
+                    "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID and last name.",
+                    "children": [
+                      {
+                        "title": "accountNumber",
+                        "validation": "15 characters",
+                        "required": true,
+                        "data_type": "string",
+                        "description": "A 15-digit unique American Express Card Account Number.",
+                        "example": "374200000000004"
+                      }
+                    ]
+                  },
+                  {
+                    "title": "status",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "The new status of the Card. This field currently supports <samp>CANCELED</samp> with additional statuses coming soon.",
+                    "example": "CANCELED",
+                    "enum": [
+                      "CANCELED"
+                    ]
+                  },
+                  {
+                    "$ref": "#/components/parameters/processId"
+                  },
+                  {
+                    "$ref": "#/components/parameters/lastFive"
+                  }
+                ]
+              },
+              "errors": {
+                "title": "errors",
+                "data_type": "array of objects",
+                "required": true,
+                "children": [
+                  {
+                    "title": "searchParameters",
+                    "required": true,
+                    "data_type": "object",
+                    "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID."
+                  },
+                  {
+                    "title": "code",
+                    "data_type": "string",
+                    "required": true,
+                    "description": "A machine-readable field indicating the type of error.",
+                    "example": "4200"
+                  },
+                  {
+                    "title": "message",
+                    "data_type": "string",
+                    "required": true,
+                    "description": "A string field that provides a short description of the error.",
+                    "example": "Invalid request"
+                  },
+                  {
+                    "title": "detail",
+                    "data_type": "string",
+                    "required": false,
+                    "description": "A string field that provides a detailed description of the error.",
+                    "example": "Invalid or missing value in: <samp>field name</samp>."
+                  },
+                  {
+                    "title": "link",
+                    "data_type": "string",
+                    "description": "A link to more documentation about the error message.",
+                    "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+                  },
+                  {
+                    "$ref": "#/components/parameters/processId_Error"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "status_type": "Bad request",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_status_update_4xx"
+              }
+            }
+          },
+          "401": {
+            "status_type": "Unauthorized",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/401_error_update"
+              }
+            }
+          },
+          "403": {
+            "status_type": "Unauthenticated",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "error": {
+                "$ref": "#/components/schemas/403_errors"
+              }
+            }
+          },
+          "500": {
+            "status_type": "Internal server error",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_status_update_5xx"
+              }
+            }
+          },
+          "504": {
+            "status_type": "Gateway timeout",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/504_errors_update"
+              }
+            }
+          }
+        }
+      },
+      "statusUpdate2": {
+        "title": "Corporate Card Management: Update a Corporate Card's Status by Employee ID",
+        "method": "PATCH",
+        "media_type": "application/json",
+        "description": "<p>The <b>@ Work Corporate Card Status Update API</b> is responsible for handling requests to update the status of a Corporate Card, Corporate Purchasing Card (CPC), or Corporate Meeting Card (CMC). This API currently supports the Cancel Card transaction.<ul class='pad-3-l'><li>The immediate Cancel Card transaction is available in the following markets: United States, United Kingdom, Australia, Canada, France, Hong Kong, Argentina, Germany, Singapore, Mexico, Italy, India, Spain, New Zealand, Austria, Netherlands, Sweden, Norway, Denmark, and Japan, in addition to International Euro Card and Global Dollar Card markets.</li><li>The future Cancel Card transaction is available in the following markets: United States, United Kingdom, Australia, Canada, France, Hong Kong, Germany, Singapore, Mexico, Italy, India, Spain, New Zealand, and Netherlands, in addition to Global Dollar Card market.</li></ul></p>",
+        "server_host": {
+          "host": "https://api.qasb2s.americanexpress.com/commercial/v1/corporate-cards/cards/status"
+        },
+        "endpoint": "PATCH/cards/status",
+        "request": {
+          "header": {
+            "title": "Request",
+            "types": [
+              "json"
+            ]
+          },
+          "body": {
+            "json": {
+              "cards": [
+                {
+                  "searchParameters": {
+                    "member": {
+                      "employeeId": "12345"
+                    }
+                  },
+                  "status": "CANCELED",
+                  "statusEffectiveDate": "2022-02-01",
+                  "statusChangeReason": "LEFT_COMPANY"
+                }
+              ]
+            }
+          }
+        },
+        "response": [
+          {
+            "value": {
+              "cards": [
+                {
+                  "searchParameters": {
+                    "member": {
+                      "employeeId": "12345"
+                    }
+                  },
+                  "status": "CANCELED",
+                  "processId": "1234567",
+                  "lastFive": "00004"
+                }
+              ]
+            }
+          }
+        ],
+        "request_parameter_description": {
+          "cards": {
+            "$ref": "#/components/schemas/cardsID"
+          }
+        },
+        "status_codes": {
+          "200": {
+            "status_type": "Successful response",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "cards": {
+                "$ref": "#/components/schemas/updateStatusResponse_200_ID"
+              }
+            }
+          },
+          "207": {
+            "status_type": "Multi-status",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "cards": {
+                "title": "cards",
+                "data_type": "array of objects",
+                "children": [
+                  {
+                    "title": "searchParameters",
+                    "required": true,
+                    "data_type": "object",
+                    "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+                    "children": [
+                      {
+                        "title": "member",
+                        "required": true,
+                        "data_type": "object",
+                        "description": "An object referencing information about a Corporate Card Member.",
+                        "children": [
+                          {
+                            "title": "employeeID",
+                            "required": true,
+                            "data_type": "string",
+                            "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                            "example": "591249124"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "title": "status",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "The new status of the Card. This field currently supports <samp>CANCELED</samp> with additional statuses coming soon.",
+                    "example": "CANCELED",
+                    "enum": [
+                      "CANCELED"
+                    ]
+                  },
+                  {
+                    "title": "processId",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "The @ Work tracking ID for the transaction. You can use this tracking ID to search for this status update operation on the @ Work Status Tracking page. If mocking has been enabled for your Sandbox environment and there is an error downstream, this field will be <samp>1234567</samp>.",
+                    "example": "1234567"
+                  },
+                  {
+                    "title": "lastFive",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "The last five digits of the Card Account Number being updated. If mocking has been enabled for your Sandbox environment and there is an error downstream, this field will be <samp>99999</samp>",
+                    "example": "12345"
+                  }
+                ]
+              },
+              "errors": {
+                "title": "errors",
+                "data_type": "array of objects",
+                "required": true,
+                "children": [
+                  {
+                    "title": "searchParameters",
+                    "required": true,
+                    "data_type": "object",
+                    "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID."
+                  },
+                  {
+                    "title": "code",
+                    "data_type": "string",
+                    "required": true,
+                    "description": "A machine-readable field indicating the type of error.",
+                    "example": "4200"
+                  },
+                  {
+                    "title": "message",
+                    "data_type": "string",
+                    "required": true,
+                    "description": "A string field that provides a short description of the error.",
+                    "example": "Invalid request"
+                  },
+                  {
+                    "title": "detail",
+                    "data_type": "string",
+                    "required": false,
+                    "description": "A string field that provides a detailed description of the error.",
+                    "example": "Invalid or missing value in: <samp>field name</samp>."
+                  },
+                  {
+                    "title": "link",
+                    "data_type": "string",
+                    "description": "A link to more documentation about the error message.",
+                    "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+                  },
+                  {
+                    "title": "processId",
+                    "required": false,
+                    "data_type": "string",
+                    "description": "The @ Work tracking ID for the transaction. You can use this tracking ID to search for this status update operation on the @ Work Status Tracking page. This field will not be present if no tracking ID is generated for the transaction.",
+                    "example": "1234567"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "status_type": "Bad request",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_status_update_4xx_ID"
+              }
+            }
+          },
+          "401": {
+            "status_type": "Unauthorized",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/401_error_update"
+              }
+            }
+          },
+          "403": {
+            "status_type": "Unauthenticated",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "error": {
+                "$ref": "#/components/schemas/403_errors"
+              }
+            }
+          },
+          "404": {
+            "status_type": "Resource not found",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/404_errorsID"
+              }
+            }
+          },
+          "500": {
+            "status_type": "Internal server error",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_status_update_5xx"
+              }
+            }
+          },
+          "504": {
+            "status_type": "Gateway timeout",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/504_errors_update"
+              }
+            }
+          }
+        }
+      },
+      "billingAddressUpdate": {
+        "title": "Corporate Card Management: Update a Corporate Card Member's Demographic Information by Account Number",
+        "method": "PATCH",
+        "media_type": "application/json",
+        "description": "<p>The <b>@ Work Corporate Card Member Demographic Information Update API</b> is responsible for handling requests to update the demographic details of a Corporate Card, Corporate Purchasing Card (CPC), or Corporate Meeting Card (CMC). This API currently supports the Billing Address Update journey and is available in the following markets: United States and Canada, in addition to Global Dollar Card market.</p>",
+        "server_host": {
+          "host": "https://api.qasb2s.americanexpress.com/commercial/v1/corporate-cards/card_members/demographics"
+        },
+        "endpoint": "PATCH/card_members/demographics",
+        "request": {
+          "header": {
+            "title": "Request",
+            "types": [
+              "json"
+            ]
+          },
+          "body": {
+            "json": {
+              "searchParameters": {
+                "accountNumber": "374200000000004"
+              },
+              "address": [
+                {
+                  "type": "BILLING",
+                  "line1": "100 Elm Street",
+                  "line2": "Suite A",
+                  "city": "Phoenix",
+                  "state": "US-AZ",
+                  "postalCode": "12345",
+                  "country": "U.S."
+                }
+              ]
+            }
+          }
+        },
+        "response": [
+          {
+            "value": {
+              "searchParameters": {
+                "accountNumber": "374200000000004"
+              },
+              "status": "SUCCESS",
+              "processId": "1234567"
+            }
+          }
+        ],
+        "request_parameter_description": {
+          "searchParameters": {
+            "$ref": "#/components/schemas/searchParameters"
+          },
+          "address": {
+            "$ref": "#/components/schemas/memberAddress"
+          }
+        },
+        "status_codes": {
+          "200": {
+            "status_type": "Successful response",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "searchParameters": {
+                "$ref": "#/components/schemas/searchParameters"
+              },
+              "status": {
+                "$ref": "#/components/schemas/billingAddressStatus_200"
+              },
+              "processId": {
+                "$ref": "#/components/schemas/billingAddressProcessId_200"
+              }
+            }
+          },
+          "400": {
+            "status_type": "Bad request",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_4xx_address"
+              }
+            }
+          },
+          "401": {
+            "status_type": "Unauthorized",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/401_error_Address"
+              }
+            }
+          },
+          "403": {
+            "status_type": "Unauthenticated",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+			"error": {
+                "$ref": "#/components/schemas/403_errors"
+              }
+            }
+          },
+          "500": {
+            "status_type": "Internal server error",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_5xx_address"
+              }
+            }
+          },
+          "504": {
+            "status_type": "Gateway timeout",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/504_errors_update"
+              }
+            }
+          }
+        }
+      },
+      "billingAddressUpdate2": {
+        "title": "Corporate Card Management: Update a Corporate Card Member's Demographic Information by Employee ID",
+        "method": "PATCH",
+        "media_type": "application/json",
+        "description": "<p>The <b>@ Work Corporate Card Member Demographic Information Update API</b> is responsible for handling requests to update the demographic details of a Corporate Card, Corporate Purchasing Card (CPC), or Corporate Meeting Card (CMC). This API currently supports the Billing Address Update journey and is available in the following markets: United States and Canada, in addition to Global Dollar Card market.</p>",
+        "server_host": {
+          "host": "https://api.qasb2s.americanexpress.com/commercial/v1/corporate-cards/card_members/demographics"
+        },
+        "endpoint": "PATCH/card_members/demographics",
+        "request": {
+          "header": {
+            "title": "Request",
+            "types": [
+              "json"
+            ]
+          },
+          "body": {
+            "json": {
+              "searchParameters": {
+                "member": {
+                  "employeeId": "12345"
+                }
+              },
+              "address": [
+                {
+                  "type": "BILLING",
+                  "line1": "100 Elm Street",
+                  "line2": "Suite A",
+                  "city": "Phoenix",
+                  "state": "US-AZ",
+                  "postalCode": "12345",
+                  "country": "US"
+                }
+              ]
+            }
+          }
+        },
+        "response": [
+          {
+            "value": {
+              "searchParameters": {
+                "member": {
+                  "employeeId": "12345"
+                },
+                "status": "SUCCESS",
+                "processId": "1234567"
+              }
+            }
+          }
+        ],
+        "request_parameter_description": {
+          "searchParameters": {
+            "$ref": "#/components/schemas/searchParametersEmployee"
+          },
+          "address": {
+            "$ref": "#/components/schemas/memberAddress"
+          }
+        },
+        "status_codes": {
+          "200": {
+            "status_type": "Successful response",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "searchParameters": {
+                "$ref": "#/components/schemas/searchParametersEmployee"
+              },
+              "status": {
+                "$ref": "#/components/schemas/billingAddressStatus_200"
+              },
+              "processId": {
+                "$ref": "#/components/schemas/billingAddressProcessId_200"
+              }
+            }
+          },
+          "400": {
+            "status_type": "Bad request",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_address_4xx_ID"
+              }
+            }
+          },
+          "401": {
+            "status_type": "Unauthorized",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/401_error_Address"
+              }
+            }
+          },
+          "403": {
+            "status_type": "Unauthenticated",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "error": {
+                "$ref": "#/components/schemas/403_errors"
+              }
+            }
+          },
+          "500": {
+            "status_type": "Internal server error",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_5xx_address"
+              }
+            }
+          },
+          "504": {
+            "status_type": "Gateway timeout",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/504_errors_address"
+              }
+            }
+          }
+        }
+      },
+      "accountingInformationUpdate": {
+        "title": "Corporate Card Management: Update a Corporate Card Member's Accounting Information by Account Number",
+        "method": "PATCH",
+        "media_type": "application/json",
+        "description": "<p>The <b>@ Work Corporate Card Member Accounting Information Update API</b> is responsible for handling requests to update the accounting details of a Corporate Card, Corporate Purchasing Card (CPC), or Corporate Meeting Card (CMC). This API currently supports updating the Card Member's Employee ID, Cost Center and Universal ID. It is available in the following markets: United States and Canada, in addition to Global Dollar Card market.</p>",
+        "server_host": {
+          "host": "https://api.qasb2s.americanexpress.com/commercial/v1/corporate-cards/card_members/accounting_information"
+        },
+        "endpoint": "PATCH/commercial/v1/corporate-cards/card_members/accounting_information",
+        "request": {
+          "header": {
+            "title": "Request",
+            "types": [
+              "json"
+            ]
+          },
+          "body": {
+            "json": {
+              "searchParameters": {
+                "accountNumber": "374200000000004"
+              },
+              "accountingInformation": {
+                "employeeId": "1234567890",
+                "costCenter": "1234567890",
+                "universalId": "1234567890"
+              }
+            }
+          }
+        },
+        "response": [
+          {
+            "value": {
+              "searchParameters": {
+                "accountNumber": "374200000000004"
+              },
+              "status": "SUCCESS",
+              "processId": "1234567"
+            }
+          }
+        ],
+        "request_parameter_description": {
+          "searchParameters": {
+            "$ref": "#/components/schemas/searchParameters"
+          },
+          "accountingInformation": {
+            "$ref": "#/components/schemas/accountingInformationParameters"
+          }
+        },
+        "status_codes": {
+          "200": {
+            "status_type": "Successful response",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "searchParameters": {
+                "$ref": "#/components/schemas/searchParameters_200_AIC"
+              },
+              "status": {
+                "$ref": "#/components/schemas/accountingInformationStatus_200"
+              },
+              "processId": {
+                "$ref": "#/components/schemas/accountingInformationProcessId_200"
+              }
+            }
+          },
+          "400": {
+            "status_type": "Bad request",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_4xx_aic"
+              }
+            }
+          },
+          "401": {
+            "status_type": "Unauthorized",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/401_error_AIC"
+              }
+            }
+          },
+          "403": {
+            "status_type": "Unauthenticated",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "error": {
+                "$ref": "#/components/schemas/403_errors"
+              }
+            }
+          },
+          "500": {
+            "status_type": "Internal server error",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_5xx_AIC"
+              }
+            }
+          },
+          "504": {
+            "status_type": "Gateway timeout",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/504_errors_aic"
+              }
+            }
+          }
+        }
+      },
+      "accountingInformationUpdate2": {
+        "title": "Corporate Card Management: Update a Corporate Card Member's Accounting Information by Employee ID",
+        "method": "PATCH",
+        "media_type": "application/json",
+        "description": "<p>The <b>@ Work Corporate Card Member Accounting Information Update API</b> is responsible for handling requests to update the accounting details of a Corporate Card, Corporate Purchasing Card (CPC), or Corporate Meeting Card (CMC). This API currently supports updating the Card Member's Employee ID, Cost Center and Universal ID. It is available in the following markets: United States and Canada, in addition to Global Dollar Card market.</p>",
+        "server_host": {
+          "host": "https://api.qasb2s.americanexpress.com/commercial/v1/corporate-cards/card_members/accounting_information"
+        },
+        "endpoint": "PATCH/commercial/v1/corporate-cards/card_members/accounting_information",
+        "request": {
+          "header": {
+            "title": "Request",
+            "types": [
+              "json"
+            ]
+          },
+          "body": {
+            "json": {
+              "searchParameters": {
+                "member": {
+                  "employeeId": "12345"
+                }
+              },
+              "accountingInformation": {
+                "employeeId": "1234567890",
+                "costCenter": "1234567890",
+                "universalId": "1234567890"
+              }
+            }
+          }
+        },
+        "response": [
+          {
+            "value": {
+              "searchParameters": {
+                "member": {
+                  "employeeId": "12345"
+                },
+                "status": "SUCCESS",
+                "processId": "1234567"
+              }
+            }
+          }
+        ],
+        "request_parameter_description": {
+          "searchParameters": {
+            "$ref": "#/components/schemas/searchParametersEmployee"
+          },
+          "accountingInformation": {
+            "$ref": "#/components/schemas/accountingInformationParameters"
+          }
+        },
+        "status_codes": {
+          "200": {
+            "status_type": "Successful response",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "searchParameters": {
+                "$ref": "#/components/schemas/searchParametersAddressEmployee_200_ID"
+              },
+              "status": {
+                "$ref": "#/components/schemas/accountingInformationStatus_200"
+              },
+              "processId": {
+                "$ref": "#/components/schemas/accountingInformationProcessId_200"
+              }
+            }
+          },
+          "400": {
+            "status_type": "Bad request",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_aic_4xx_ID"
+              }
+            }
+          },
+          "401": {
+            "status_type": "Unauthorized",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/401_error_AIC"
+              }
+            }
+          },
+          "403": {
+            "status_type": "Unauthenticated",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "error": {
+                "$ref": "#/components/schemas/403_errors"
+              }
+            }
+          },
+          "500": {
+            "status_type": "Internal server error",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_5xx_AIC"
+              }
+            }
+          },
+          "504": {
+            "status_type": "Gateway timeout",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/504_errors_aic"
+              }
+            }
+          }
+        }
+      },
+      "getApplicationDetails": {
+        "title": "Corporate Card Management: Get Details for a Corporate Card Application",
+        "method": "GET",
+        "media_type": "application/json",
+        "description": "<p>The <b>@ Work Get Application Details API</b> is an endpoint that is responsible for retrieving various details about a Global Apply for Card (GAFC) Corporate Card Application. This API will assist you in validating whether an Application is pending, rejected or approved. It is available in the following markets: United States, United Kingdom, Australia, India, New Zealand, Italy, and Japan, in addition to International Euro Card and Global Dollar Card markets.",
+        "server_host": {
+          "host": "https://api.qasb2s.americanexpress.com/commercial/v1/corporate-cards/cards/applications/{applicationId}"
+        },
+        "endpoint": "GET/corporate-cards/cards/applications/{applicationId}",
+        "response": [
+          {
+            "value": {
+              "searchParameters": {
+                "applicationId": "US-1JEYV37SNNCK"
+              },
+              "createdOn": "2024-06-21",
+              "submittedOn": "2024-06-05",
+              "transactionStatus": "APPROVED_BY_AMEX",
+              "market": "US"
+            }
+          }
+        ],
+        "query_parameter_description": {
+          "applicationId": {
+            "title": "applicationId",
+            "in": "query",
+            "description": "The ID associated with the Global Apply for Card (GAFC) Corporate Card Application.",
+            "required": true,
+            "data_type": "string",
+            "example": "US-1JEYV37SNNCK"
+          }
+        },
+        "status_codes": {
+          "200": {
+            "status_type": "Successful response",
+            "headers": {
+              "Content-Type": {
+                "media_type": "application/json",
+                "data_type": "string",
+                "required": true
+              },
+              "Request-Id": {
+                "media_type": "The unique ID for the API request.",
+                "data_type": "string",
+                "required": true,
+                "example": "00000000-cfe6-495d-98cc-7fb1be768a3d"
+              }
+            },
+            "body": {
+              "searchParameters": {
+                "$ref": "#/components/schemas/searchParametersApplicationId"
+              },
+              "createdOn": {
+                "$ref": "#/components/schemas/getApplicationDetailsCreatedOn_200"
+              },
+              "submittedOn": {
+                "$ref": "#/components/schemas/getApplicationDetailsSubmittedOn_200"
+              },
+              "transactionStatus": {
+                "$ref": "#/components/schemas/getApplicationDetailsTransactionStatus_200"
+              },
+              "market": {
+                "$ref": "#/components/schemas/getApplicationDetailsMarket_200"
+              }
+            }
+          },
+          "400": {
+            "status_type": "Bad request",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_apply_4xx"
+              }
+            }
+          },
+          "401": {
+            "status_type": "Unauthorized",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/401_error_apply"
+              }
+            }
+          },
+          "403": {
+            "status_type": "Unauthenticated",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "error": {
+                "$ref": "#/components/schemas/403_errors"
+              }
+            }
+          },
+          "500": {
+            "status_type": "Internal server error",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/error_array_apply_5xx"
+              }
+            }
+          },
+          "504": {
+            "status_type": "Gateway timeout",
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/parameters/Request-Id"
+              },
+              "Date": {
+                "$ref": "#/components/parameters/date"
+              }
+            },
+            "body": {
+              "errors": {
+                "$ref": "#/components/schemas/504_errors_apply"
+              }
+            }
+          }
         }
       }
     }
   },
-
-  "correctCaseExample": {
-    "releaseDate": "November 5, 2025"
+  "errors": {
+    "title": "Errors",
+    "content": {
+      "/cards/applications": [
+        {
+          "error_code": "1020",
+          "error_message": "Authz Failure",
+          "error_details": "Unable to locate the BCA associated with the implemented Corporate IDs in @ Work APIs. Contact @ Work API Support for further inquiries."
+        },
+        {
+          "error_code": "4000",
+          "error_message": "Invalid request",
+          "error_details": "Invalid [fieldName]. The field or query parameter value is not formatted correctly."
+        },
+        {
+          "error_code": "4001",
+          "error_message": "Invalid request",
+          "error_details": "The [fieldName] value violated minimum length rules in the API contract. The minimum length is [minLength] for [marketName] Card Applications."
+        },
+        {
+          "error_code": "4001",
+          "error_message": "Invalid request",
+          "error_details": "The [fieldName] value violated maximum length rules in the API contract. The maximum length is [maxLength] for [marketName] Card Applications."
+        },
+        {
+          "error_code": "4004",
+          "error_message": "Invalid request",
+          "error_details": "The required field [fieldName] is missing, null, or empty."
+        },
+        {
+          "error_code": "4008",
+          "error_message": "Invalid request",
+          "error_details": "The number of items in the [fieldName] array are beyond the limit specified in the <samp>MAXITEMS</samp> parameter in the contract."
+        },
+        {
+          "error_code": "4011",
+          "error_message": "Invalid request",
+          "error_details": "Something went wrong when trying to parse the request body. Please check the API contract."
+        },
+        {
+          "error_code": "4013",
+          "error_message": "Invalid request",
+          "error_details": "The field value is not applicable or is not in the list of enumerations. See [fieldName] in the specification."
+        },
+        {
+          "error_code": "4013",
+          "error_message": "Invalid request",
+          "error_details": "The field value is not in the list of&nbsp;<a href='https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2'>ISO country codes.</a> See <samp>applicant.address.countryCode</samp> in the specification."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "Invalid request",
+          "error_details": "The <samp>APPLY</samp> operation is not valid for [marketName] cards. See the API specifications for market restrictions."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "Invalid request",
+          "error_details": "<samp>Application.Address.AddressLine3</samp> and <samp>Application.Address.AddressLine4</samp> are not valid for [marketName] market Card Applications."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "Invalid request",
+          "error_details": "<samp>Application.Address.AddressLine4</samp> is not valid for [marketName] market Card Applications."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "Invalid request",
+          "error_details": "<samp>Application.Address.AddressLine2</samp>, <samp>Application.Address.AddressLine3</samp> and <samp>Application.Address.AddressLine4</samp> are not valid for [marketName] market Card Applications."
+        },
+        {
+          "error_code": "4200",
+          "error_message": "Invalid request",
+          "error_details": "The Card type, [cardType], is not associated with this Basic Control Account."
+        },
+        {
+          "error_code": "4201",
+          "error_message": "Invalid request",
+          "error_details": "The email address in <samp>applicant.email</samp> is already associated with another Card Application."
+        },
+        {
+          "error_code": "4202",
+          "error_message": "Invalid request",
+          "error_details": "The Basic Control Account is inactive. Ineligible to initiate new Card Applications."
+        },
+        {
+          "error_code": "5100-5150",
+          "error_message": "Internal server error",
+          "error_details": "Please try again. If the error persists, contact @ Work API Support."
+        }
+      ],
+      "/cards/status": [
+        {
+          "error_code": "1020",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate Card associated with the implemented Corporate IDs in @ Work APIs. Contact @ Work AI Support for further inquiries. Unable to find: searchParameters.accountNumber."
+        },
+        {
+          "error_code": "1023",
+          "error_message": "Permission Denied",
+          "error_details": "Please contact your Program Administrator / Outsourced Program Administrator to manage this card in @ Work."
+        },
+        {
+          "error_code": "1025",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate Card associated with the implemented Corporate IDs in @ Work APIs. Contact @ Work API Support for further inquiries. Unable to find: searchParameters.employeeId."
+        },
+        {
+          "error_code": "1026",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate Card associated with the implemented Corporate IDs in @ Work APIs. Contact @ Work API Support further inquiries. Unable to find: searchParameters.accountNumber."
+        },
+        {
+          "error_code": "4000",
+          "error_message": "Invalid Format",
+          "error_details": "The field or query parameter value is not formatted correctly: searchParameters.accountNumber."
+        },
+        {
+          "error_code": "4004",
+          "error_message": "Invalid request",
+          "error_details": "The required field [fieldName] is missing, null, or empty."
+        },
+        {
+          "error_code": "4004",
+          "error_message": "Invalid request",
+          "error_details": "Invalid statusEffectiveDate. Must be in <samp>YYYY-MM-DD</samp> format."
+        },
+        {
+          "error_code": "4004",
+          "error_message": "Invalid request",
+          "error_details": "Invalid [fieldName]. Field or query parameter value is not formatted correctly."
+        },
+        {
+          "error_code": "4005",
+          "error_message": "Invalid request",
+          "error_details": "The mandatory request header is missing in the request: [headerName]"
+        },
+        {
+          "error_code": "4007",
+          "error_message": "Card not found",
+          "error_details": "Unable to locate the Card via Employee ID."
+        },
+        {
+          "error_code": "4008",
+          "error_message": "Invalid request",
+          "error_details": "The number of items in the array are beyond the limit specified in the <samp>MAXITEMS</samp> parameter in the contract. Only one Card allowed per request."
+        },
+        {
+          "error_code": "4011",
+          "error_message": "Invalid request",
+          "error_details": "Something went wrong when trying to parse the request body. Please check the API contract."
+        },
+        {
+          "error_code": "4012",
+          "error_message": "Invalid request",
+          "error_details": "The required field [fieldName] for the <samp>CANCELED</samp> operation is missing or null."
+        },
+        {
+          "error_code": "4013",
+          "error_message": "Invalid request",
+          "error_details": "The field value is not applicable or is not in the list of enumerations. See [fieldName] in the specification."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "The Card is ineligible to be canceled via API",
+          "error_details": "The <samp>CANCELED</samp> operation is not valid for [marketName] cards. See the API specifications for market restrictions."
+        },
+        {
+          "error_code": "4091",
+          "error_message": "The Card is ineligible to be canceled via API",
+          "error_details": "Account transfer for this Card has already been submitted. For further assistance, please contact the @ Work help desk."
+        },
+        {
+          "error_code": "4092",
+          "error_message": "The Card is ineligible to be canceled via API",
+          "error_details": "The Card is not in Active status and cannot be canceled."
+        },
+        {
+          "error_code": "4201",
+          "error_message": "Invalid request",
+          "error_details": "Cards cannot be scheduled to be canceled more than six months into the future."
+        },
+        {
+          "error_code": "4202",
+          "error_message": "Invalid request",
+          "error_details": "Invalid statusEffectiveDate. Future dated cancellations are not supported for cards in the [marketName] market."
+        },
+        {
+          "error_code": "4203",
+          "error_message": "Invalid request",
+          "error_details": "The Card cannot be canceled with <samp>DECEASED</samp> as the <samp>statusChangeReason</samp> for the India market cards. Contact the @ Work help desk for this cancellation."
+        },
+        {
+          "error_code": "5001",
+          "error_message": "Internal server error",
+          "error_details": "Encountered a timeout. Please try again. If the error persists, contact @ Work API Support."
+        },
+        {
+          "error_code": "5120",
+          "error_message": "Internal server error",
+          "error_details": "Please try again. If the error persists, contact @ Work API Support."
+        }
+      ],
+      "/card_members/accounting_information": [
+        {
+          "error_code": "1020",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate Card associated with the implemented Corporate IDs in @ Work APIs. Contact @ Work API Support for further inquiries. Unable to find: searchParameters.accountNumber."
+        },
+        {
+          "error_code": "1023",
+          "error_message": "Permission Denied",
+          "error_details": "Please contact your Program Administrator / Outsourced Program Administrator to manage this card in @ Work."
+        },
+        {
+          "error_code": "1023",
+          "error_message": "API Operation Not Allowed",
+          "error_details": "This operation is not allowed for District 59 Independents. Contact the @ Work help desk for further inquiries."
+        },
+        {
+          "error_code": "1023",
+          "error_message": "API Operation Not Allowed",
+          "error_details": "The Card cannot be administered through @ Work Program Management. Contact the @ Work help desk for further inquiries."
+        },
+        {
+          "error_code": "1025",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate Card associated with the implemented Corporate IDs in @ Work Apis. Contact @ Work API Support for further inquiries. Unable to find: searchParameters.employeeId"
+        },
+        {
+          "error_code": "1026",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate Card associated with the implemented Corporate IDs in @ Work APIs. Contact @ Work API Support further inquiries. Unable to find: searchParameters.accountNumber."
+        },
+        {
+          "error_code": "4000",
+          "error_message": "Invalid Format",
+          "error_details": "The field or query parameter value is not formatted correctly: [fieldName]."
+        },
+        {
+          "error_code": "4001",
+          "error_message": "Length Violation",
+          "error_details": "The field or query parameter violated MAXLENGTH rules in API contract: [fieldName]."
+        },
+        {
+          "error_code": "4004",
+          "error_message": "Required Parameters Missing",
+          "error_details": "Some of the mandatory parameters in the query or the body are missing in the request: [fieldName]."
+        },
+        {
+          "error_code": "4011",
+          "error_message": "Parsing Error",
+          "error_details": "The payload is invalid hence can not be parsed. Please check the API specifications."
+        },
+        {
+          "error_code": "4012",
+          "error_message": "Field Empty",
+          "error_details": "The field is null or empty: [fieldName]"
+        },
+        {
+          "error_code": "4013",
+          "error_message": "Invalid Value",
+          "error_details": "The field value is not in the list of enumerations. See ENUM in API specifications: [fieldName]."
+        },
+        {
+          "error_code": "4013",
+          "error_message": "Value Unchanged",
+          "error_details": "This operation is not valid as there is no data change to field: [fieldName]."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "Invalid Operation for Market",
+          "error_details": "This operation is not valid for [market name] market cards. See API specifications for market restrictions."
+        },
+        {
+          "error_code": "5001",
+          "error_message": "API Timeout",
+          "error_details": "The system encountered a timeout. Try again later."
+        },
+        {
+          "error_code": "5100-5150",
+          "error_message": "Internal Server Error",
+          "error_details": "Please try again. If error persists, contact @ Work API Support."
+        }
+      ],
+      "/card_members/demographics": [
+        {
+          "error_code": "1020",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate Card associated with the implemented Corporate IDs in @ Work APIs. Contact @ Work API Support for further inquiries. Unable to find: searchParameters.accountNumber."
+        },
+        {
+          "error_code": "1023",
+          "error_message": "Permission Denied",
+          "error_details": "Please contact your Program Administrator / Outsourced Program Administrator to manage this card in @ Work."
+        },
+        {
+          "error_code": "1023",
+          "error_message": "API Operation Not Allowed",
+          "error_details": "This operation is not allowed as the Card cannot be administered through @ Work. Contact the @ Work help desk for further inquiries."
+        },
+        {
+          "error_code": "1025",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate Card associated with the implemented Corporate IDs in @ Work APIs. Contact @ Work API Support for further inquiries. Unable to find: searchParameters.employeeId"
+        },
+        {
+          "error_code": "1026",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate Card associated with the implemented Corporate IDs in @ Work APIs. Contact @ Work API Support further inquiries. Unable to find: searchParameters.accountNumber."
+        },
+        {
+          "error_code": "4000",
+          "error_message": "Invalid Format",
+          "error_details": "The field or query parameter value is not formatted correctly: [fieldName]"
+        },
+        {
+          "error_code": "4001",
+          "error_message": "Length Violation",
+          "error_details": "The field or query parameter value violated the <samp>MINLENGTH</samp> rules in API contract: [fieldName]."
+        },
+        {
+          "error_code": "4001",
+          "error_message": "Length Violation",
+          "error_details": "The field or query parameter value violated the <samp>MAXLENGTH</samp> rules in API contract: [fieldName]."
+        },
+        {
+          "error_code": "4004",
+          "error_message": "Required Parameters Missing",
+          "error_details": "Some of the mandatory parameters in the query or the body are missing in the request: [fieldName]."
+        },
+        {
+          "error_code": "4008",
+          "error_message": "Array Overflow",
+          "error_details": "The number of items in the array are beyond the limit specified in <samp>MAXITEMS</samp> parameter in the contract: address."
+        },
+        {
+          "error_code": "4008",
+          "error_message": "Array Underflow",
+		  "error_details": "The number of items in the array are beyond the limit specified in <samp>MINITEMS</samp> parameter in the contract: address."
+        },
+        {
+          "error_code": "4011",
+          "error_message": "Parsing Error",
+          "error_details": "The payload is invalid hence can not be parsed. Please check the API specifications."
+        },
+        {
+          "error_code": "4012",
+          "error_message": "Field Empty",
+          "error_details": "The field is null or empty: [fieldName]"
+        },
+        {
+          "error_code": "4013",
+          "error_message": "Invalid Value",
+          "error_details": "The field value is not in the list of enumerations. See ENUM in API specifications: [fieldName]"
+        },
+        {
+          "error_code": "4013",
+          "error_message": "Value Unchanged",
+          "error_details": "This operation is not valid as there is no data change to field: [fieldName]."
+        },
+        {
+          "error_code": "4013",
+          "error_message": "Value Unchanged",
+          "error_details": "The field value is not in the list of ISO country codes. See address.country in the specification."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "Invalid Attribute/Value for Market",
+          "error_details": "The attribute or its value is not valid for [USA or Canada] country codes. See API specifications for country restrictions: address.state."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "Invalid Attribute/Value for Market",
+          "error_details": "The attribute or its value is not valid for [User inputted countryCode] country codes. See API specifications for country restrictions: address.state."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "Invalid Attribute/Value for Market",
+          "error_details": "The address.country, [countryCode User inputted] is not valid for [USA or CANADA] market cards. See API specifications for market restrictions: address.country."
+        },
+        {
+          "error_code": "4014",
+          "error_message": "Invalid Attribute/Value for Market",
+          "error_details": "This operation is not valid for [market name] market cards. See API specifications for market restrictions."
+        },
+        {
+          "error_code": "4016",
+          "error_message": "Conflict Between Input Fields",
+          "error_details": "The provided address.postalCode does not correspond to the address.state specified in the input."
+        },
+        {
+          "error_code": "5001",
+          "error_message": "Timeout",
+          "error_details": "The system encountered a timeout. Try again later."
+        },
+        {
+          "error_code": "5100-5150",
+          "error_message": "Internal Server Error",
+          "error_details": "Please try again. If the error persists, contact @ Work API Support."
+        }
+      ],
+      "/corporate-cards/cards/applications/{applicationId}": [
+        {
+          "error_code": "1024",
+          "error_message": "Permission Denied",
+          "error_details": "Unable to locate the application associated with implemented Corporate IDs in @ Work APIs. Contact @ Work API Support for further inquiries. Unable to find: <samp>applicationId</samp>."
+        },
+        {
+          "error_code": "2000",
+          "error_message": "Too Many Calls",
+          "error_details": "The maximum allowed concurrent request threshold was breached."
+        },
+        {
+          "error_code": "4007",
+          "error_message": "Invalid URI Path",
+          "error_details": "No resource is found at the URL. Either the URL is invalid or there is no record found for the path parameter."
+        },
+        {
+          "error_code": "4011",
+          "error_message": "Parsing Error",
+          "error_details": "The payload is invalid hence can not be parsed. Request body cannot be included for this endpoint."
+        },
+        {
+          "error_code": "5134-5138",
+          "error_message": "Internal Server Error",
+          "error_details": "Please try again. If error persists, contact @ Work API Support."
+        }
+      ]
+    }
+  },
+  "headers": {
+    "title": "Headers",
+    "description": "The following headers must be used in the specified request types to communicate with the @ Work APIs.",
+    "content": [
+      {
+        "name": "Request-Id",
+        "description": "A unique ID for the API request.",
+        "request_Type": [
+          "POST",
+          "PUT",
+          "PATCH",
+          "GET",
+          "DELETE"
+        ]
+      },
+      {
+        "name": "Client-Id",
+        "description": "A unique key assigned by American Express to the API consumer for identification.",
+        "request_Type": [
+          "POST",
+          "PUT",
+          "PATCH",
+          "GET",
+          "DELETE"
+        ]
+      },
+      {
+        "name": "Idempotency-Key",
+        "description": "A unique string, generated by the Client, that American Express supports to protect against repeated API calls that can have negative consequences. The server uses this key to recognize multiple attempts of the same request. When the API retries due to failure, the key should be reused to indicate that the same request is being sent. The key should be stored for 24 hours in case of failures. American Express requires a Version four UUID or similar random string that has enough entropy to prevent clashes.",
+        "request_Type": [
+          "POST",
+          "PATCH",
+          "DELETE"
+        ]
+      },
+      {
+        "name": "Authorization",
+        "description": "An OAuth2 Bearer token that consumers use to gain access to the American Express API. The value passed here is the response of the Access Token API. See the Authorization section for more details.",
+        "request_Type": [
+          "POST",
+          "PUT",
+          "PATCH",
+          "GET",
+          "DELETE"
+        ]
+      }
+    ],
+    "request": {
+      "title": "Sample request header",
+      "body": "<p class='pad-1-b'>Content-Type: application/json,</p><p class='pad-1-b'>Authorization: Bearer {_your_encoded_credentials_},</p><p class='pad-1-b'>Request-Id: 0c7296d9-11bf-4e49-a65f-fb8194,</p><p class='pad-1-b'>Idempotency-Key: 5bb95736-a548-4731-9d32-6d0e5e,</p><p class='pad-0-b'>Client-Id: 00000000-d8v7-262f-33ot-9vh35dsj8x8m</p>"
+    }
+  },
+  "components": {
+    "schemas": {
+      "error": {
+        "title": "error",
+        "data_type": "object",
+        "children": [
+          {
+            "title": "errorCode",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "2300"
+          },
+          {
+            "title": "errorDescription",
+            "data_type": "string",
+            "description": "A short description of the error.",
+            "example": "Your request cannot be processed at this time. Please try again later."
+          }
+        ]
+      },
+      "400_error": {
+        "title": "errors",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Invalid request"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Invalid or missing value in: <samp>field name</samp>."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          }
+        ]
+      },
+      "401_error_apply": {
+        "title": "errors",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Authorization Failure"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Session Invalid"
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          }
+        ]
+      },
+      "401_error_update": {
+        "title": "errors",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Authorization Failure"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Session Invalid"
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processId_Error"
+          }
+        ]
+      },
+      "401_error_Address": {
+        "title": "errors",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Authorization Failure"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Session Invalid"
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_ErrorAddress"
+          }
+        ]
+      },
+      "401_error_AIC": {
+        "title": "errors",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Authorization Failure"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Session Invalid"
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_AccountingInformation"
+          }
+        ]
+      },
+      "403_errors": {
+        "title": "error",
+        "data_type": "object",
+        "children": [
+          {
+            "title": "errorCode",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "1020"
+          },
+          {
+            "title": "errorDescription",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "The caller is not authorized to perform this action for the requested endpoint."
+          }
+        ]
+      },
+      "404_errorsID": {
+        "title": "error",
+        "data_type": "object",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4007"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Card not found"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Unable to locate the Card via Employee ID."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processId_Error"
+          }
+        ]
+      },
+      "error_array_status_update_5xx": {
+        "title": "error_array_status_update_5xx",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "5101"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Internal server error"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Please try again. If the error persists, contact @ Work API Support."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processId_Error"
+          }
+        ]
+      },
+      "error_array_5xx_address": {
+        "title": "error_array_status_update_5xx_address",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "5101"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Internal server error"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Please try again. If the error persists, contact @ Work API Support."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_ErrorAddress"
+          }
+        ]
+      },
+      "error_array_5xx_AIC": {
+        "title": "error_array_status_update_5xx_AIC",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "5101"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Internal server error"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Please try again. If the error persists, contact @ Work API Support."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_AccountingInformation"
+          }
+        ]
+      },
+      "error_array_status_update_4xx": {
+        "title": "error_array_status_update_4xx",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "accountNumber",
+                "validation": "15 characters",
+                "required": true,
+                "data_type": "string",
+                "description": "A 15-digit unique American Express Card Account Number.",
+                "example": "374200000000004"
+              }
+            ]
+          },
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Invalid request"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Something went wrong when trying to parse the request body. Please check the API contract."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processId_Error"
+          }
+        ]
+      },
+      "error_array_4xx_address": {
+        "title": "error_array_4xx_address",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "accountNumber",
+                "validation": "15 characters",
+                "required": true,
+                "data_type": "string",
+                "description": "A 15-digit unique American Express Card Account Number.",
+                "example": "374200000000004"
+              }
+            ]
+          },
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Invalid request"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Something went wrong when trying to parse the request body. Please check the API contract."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_ErrorAddress"
+          }
+        ]
+      },
+      "error_array_4xx_aic": {
+        "title": "error_array_4xx_aic",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "accountNumber",
+                "validation": "15 characters",
+                "required": true,
+                "data_type": "string",
+                "description": "A 15-digit unique American Express Card Account Number.",
+                "example": "374200000000004"
+              }
+            ]
+          },
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Invalid request"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Something went wrong when trying to parse the request body. Please check the API contract."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_AccountingInformation"
+          }
+        ]
+      },
+      "error_array_address_4xx_ID": {
+        "title": "error_array_address_4xx_ID",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "member",
+                "required": true,
+                "data_type": "object",
+                "description": "An object referencing information about a Corporate Card Member.",
+                "children": [
+                  {
+                    "title": "employeeId",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                    "example": "591249124"
+                  }
+                ]
+              },
+              {
+                "$ref": "#/components/parameters/processID_ErrorAddress"
+              }
+            ]
+          },
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Invalid request"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Something went wrong when trying to parse the request body. Please check the API contract."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_ErrorAddress"
+          }
+        ]
+      },
+      "error_array_status_update_4xx_ID": {
+        "title": "error_array_status_update_4xx",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "member",
+                "required": true,
+                "data_type": "object",
+                "description": "An object referencing information about a Corporate Card Member.",
+                "children": [
+                  {
+                    "title": "employeeId",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                    "example": "591249124"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Invalid request"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Something went wrong when trying to parse the request body. Please check the API contract."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processId_Error"
+          }
+        ]
+      },
+      "error_array_aic_4xx_ID": {
+        "title": "error_array_aic_4xx",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "member",
+                "required": true,
+                "data_type": "object",
+                "description": "An object referencing information about a Corporate Card Member.",
+                "children": [
+                  {
+                    "title": "employeeId",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                    "example": "591249124"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Invalid request"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Something went wrong when trying to parse the request body. Please check the API contract."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_AccountingInformation"
+          }
+        ]
+      },
+      "504_errors_apply": {
+        "title": "error",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "5001"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Internal server error"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Encountered a timeout. Please try again. If the error persists, contact @ Work API Support."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          }
+        ]
+      },
+      "504_errors_update": {
+        "title": "error",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "5001"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Internal server error"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Encountered a timeout. Please try again. If the error persists, contact @ Work API Support."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processId_Error"
+          }
+        ]
+      },
+      "504_errors_aic": {
+        "title": "error",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "5001"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Internal server error"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Encountered a timeout. Please try again. If the error persists, contact @ Work API Support."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_AccountingInformation"
+          }
+        ]
+      },
+      "504_errors_address": {
+        "title": "error",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "5001"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Internal server error"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Encountered a timeout. Please try again. If the error persists, contact @ Work API Support."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          },
+          {
+            "$ref": "#/components/parameters/processID_ErrorAddress"
+          }
+        ]
+      },
+      "error_array_apply_5xx": {
+        "title": "error_array_apply_5xx",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "5101"
+          },
+		  {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Internal server error"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Please try again. If the error persists, contact @ Work API Support."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          }
+        ]
+      },
+      "error_array_apply_4xx": {
+        "title": "error_array_apply_4xx",
+        "required": true,
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "code",
+            "data_type": "string",
+            "required": true,
+            "description": "A machine-readable field indicating the type of error.",
+            "example": "4200"
+          },
+          {
+            "title": "message",
+            "data_type": "string",
+            "required": true,
+            "description": "A string field that provides a short description of the error.",
+            "example": "Invalid request"
+          },
+          {
+            "title": "detail",
+            "data_type": "string",
+            "required": false,
+            "description": "A string field that provides a detailed description of the error.",
+            "example": "Something went wrong when trying to parse the request body. Please check the API contract."
+          },
+          {
+            "title": "link",
+            "data_type": "string",
+            "description": "A link to more documentation about the error message.",
+            "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+          }
+        ]
+      },
+      "applicant": {
+        "title": "applicant",
+        "titleDescription": "The Card Applicant object.",
+        "required": true,
+        "data_type": "object",
+        "children": [
+          {
+            "$ref": "#/components/schemas/name"
+          },
+          {
+            "$ref": "#/components/schemas/address"
+          },
+          {
+            "$ref": "#/components/schemas/email"
+          },
+          {
+            "$ref": "#/components/schemas/dateOfBirth"
+          },
+          {
+            "$ref": "#/components/schemas/phone"
+          },
+          {
+            "$ref": "#/components/schemas/governmentId"
+          },
+          {
+            "$ref": "#/components/schemas/accountingInformation"
+          }
+        ]
+      },
+      "company": {
+        "title": "company",
+        "titleDescription": "The company of the Card Applicant.",
+        "data_type": "object",
+        "children": [
+          {
+            "title": "phone",
+            "titleDescription": "The contact phone number for the Client.",
+            "data_type": "object",
+            "required": true,
+            "children": [
+              {
+                "title": "countryCode",
+                "required": true,
+                "validation": "&le;3 characters",
+                "data_type": "string",
+                "description": "The country code of the corresponding Client phone number, not applicable for some countries.",
+                "example": "1"
+              },
+              {
+                "title": "areaCode",
+                "data_type": "string",
+                "description": "The Area Code of corresponding Client phone number, not applicable for some countries.",
+                "example": "555"
+              },
+              {
+                "title": "number",
+                "required": true,
+                "data_type": "string",
+                "description": "The phone number of the Client.",
+                "example": "5555551111"
+              },
+              {
+                "title": "extension",
+                "data_type": "string",
+                "description": "The extension of the corresponding Client phone number, not applicable for some countries.",
+                "example": "1111"
+              }
+            ]
+          }
+        ]
+      },
+      "governmentId": {
+        "title": "governmentId",
+        "data_type": "object",
+        "description": "The Card Applicant's government-issued identification number. This field is only valid for the U.S. market and is required if the object is present.",
+        "children": [
+          {
+            "title": "type",
+            "required": false,
+            "data_type": "string",
+            "description": "The type of government-issued identification provided by the Card Applicant (e.g., SSN, ITIN, passport, or other national identifier). This field is required if the object is present. For Full Corporate Liability Basic Control Accounts, only SSN is supported (subject to configuration).",
+            "example": "SOCIAL_SECURITY_NUMBER",
+            "enum": [
+              "SOCIAL_SECURITY_NUMBER",
+              "ITIN",
+              "FOREIGN_PASSPORT_NUMBER",
+              "FOREIGN_DRIVERS_LICENSE",
+              "FOREIGN_NATIONAL_IDENTIFIER"
+            ]
+          },
+          {
+            "title": "value",
+            "required": false,
+            "data_type": "string",
+            "description": "The actual government-issued identification number of the Card Applicant.",
+            "example": "123-45-6789"
+          },
+          {
+            "title": "countryOfIssuance",
+            "required": false,
+            "data_type": "string",
+            "description": "The country that issued the Card Applicant's identification document.  This field is optional and must comply with <samp>ISO alpha-2</samp> numeric format.",
+            "example": "U.S."
+          },
+          {
+            "title": "dateOfIssuance",
+            "required": false,
+            "data_type": "string",
+            "description": "The Card Applicant's identification document issuance date in <samp>YYYY-MM-DD</samp> format. This date cannot be in the future.",
+            "example": "2022-02-20"
+          },
+          {
+            "title": "dateOfExpiry",
+            "required": false,
+            "data_type": "string",
+            "description": "The Card Applicant's identification document expiration date in <samp>YYYY-MM-DD</samp> format. This date cannot be in the past.",
+            "example": "2027-02-20"
+          }
+        ]
+      },
+      "accountingInformation": {
+        "title": "accountingInformation",
+        "titleDescription": "The accounting information of the Card Applicant. If this object is included, at least one of the fields below must be provided.",
+        "data_type": "object",
+        "children": [
+          {
+            "title": "employeeId",
+            "validation": "&le;10 characters",
+            "required": false,
+            "data_type": "string",
+            "description": "A unique identifier assigned by the American Express Client.",
+            "example": "2322199833"
+          },
+          {
+            "title": "costCenter",
+            "validation": "&le;10 characters",
+            "required": false,
+            "data_type": "string",
+            "description": "A unique identifier assigned by the American Express Client to a Client Cost Center.",
+            "example": "7376323042"
+          },
+          {
+            "title": "universalId",
+            "validation": "&le;25 characters",
+            "required": false,
+            "data_type": "string",
+            "description": "A unique identifier, assigned by the American Express Client, driven by the Basic Control Account. This field will only be pre-populated for the U.S. market Card Applications.",
+            "example": "7376323042"
+          }
+        ]
+      },
+      "account": {
+        "title": "account",
+        "titleDescription": "Details regarding the Client's Corporate Card Account at American Express.",
+        "required": true,
+        "data_type": "object",
+        "children": [
+          {
+            "title": "type",
+            "required": true,
+            "data_type": "string",
+            "description": "A type of account for the Client's relationship with American Express. This field currently supports <samp>BASIC_CONTROL_ACCOUNT</samp>.",
+            "example": "BASIC_CONTROL_ACCOUNT",
+            "enum": [
+              "BASIC_CONTROL_ACCOUNT"
+            ]
+          },
+          {
+            "title": "ID",
+            "validation": "15 characters",
+            "required": true,
+            "data_type": "string",
+            "description": "An identifier for the Client's account with American Express. This field should be the Basic Control Account that the Card Application is associated with.",
+            "example": "122000000000003"
+          }
+        ]
+      },
+      "name": {
+        "title": "name",
+        "titleDescription": "The name of the Card Applicant.",
+        "required": true,
+        "data_type": "object",
+        "children": [
+          {
+            "title": "first",
+            "data_type": "string",
+            "required": true,
+            "description": "The first or given name of the Card Applicant.",
+            "example": "John"
+          },
+          {
+            "title": "middle",
+            "data_type": "string",
+            "description": "The middle name or initial of the Card Applicant.",
+            "example": "M"
+          },
+          {
+            "title": "last",
+            "data_type": "string",
+            "required": true,
+            "description": "The last name of the Card Applicant.",
+            "example": "Smith"
+          }
+        ]
+      },
+      "phone": {
+        "title": "phone",
+        "titleDescription": "The phone details of the Card Applicant. This array currently supports one phone number per Card Applicant.",
+        "data_type": "array of objects",
+        "children": [
+          {
+            "title": "type",
+            "required": true,
+            "data_type": "string",
+            "description": "The type of phone number for the Card Applicant. This field currently supports <samp>HOME</samp>.",
+            "example": "HOME",
+            "enum": [
+              "HOME"
+            ]
+          },
+          {
+            "title": "countryCode",
+            "required": true,
+            "validation": "&le;3 characters",
+            "data_type": "string",
+            "description": "The country code of the corresponding Card Applicant phone number, not applicable for some countries.",
+            "example": "1"
+          },
+          {
+            "title": "areaCode",
+            "data_type": "string",
+            "description": "The Area Code of corresponding Card Applicant phone number, not applicable for some countries.",
+            "example": "555"
+          },
+          {
+            "title": "number",
+            "required": true,
+            "data_type": "string",
+            "description": "The phone number of the Card Applicant.",
+            "example": "(555) 555-1111"
+          },
+          {
+            "title": "extension",
+            "data_type": "string",
+            "description": "The extension of the corresponding Card Applicant phone number, not applicable for some countries.",
+            "example": "1111"
+          }
+        ]
+      },
+      "address": {
+        "title": "address",
+        "titleDescription": "The address of the Card Applicant (residential and/or work/business). This array supports multiple address types per Card Applicant. The <samp>WORK</samp> address type is supported in the U.S. only.",
+        "data_type": "array of objects",
+        "required": false,
+        "children": [
+          {
+            "title": "type",
+            "data_type": "string",
+            "required": false,
+            "description": "The type of the address associated with the Card Applicant.",
+            "example": "HOME",
+            "enum": [
+              "HOME",
+              "WORK"
+            ]
+          },
+          {
+            "title": "line1",
+            "required": true,
+            "data_type": "string",
+            "description": "The first line of the Card Applicant's street address.",
+            "example": "100 Elm Street"
+          },
+          {
+            "title": "line2",
+            "data_type": "string",
+            "description": "The second line of the Card Applicant's street address (not applicable in all markets).",
+            "example": "Suite A"
+          },
+          {
+            "title": "line3",
+            "data_type": "string",
+            "description": "The third line of the Card Applicant's street address (not applicable in all markets).",
+            "example": "4th Floor"
+          },
+          {
+            "title": "line4",
+            "data_type": "string",
+            "description": "The fourth line of the Card Applicant's street address (not applicable in all markets)."
+          },
+          {
+            "title": "city",
+            "required": true,
+            "data_type": "string",
+            "description": "The city of the Card Applicant's residence.",
+            "example": "Phoenix"
+          },
+          {
+            "title": "state",
+            "data_type": "string",
+            "description": "The state or region of the Card Applicant's residence.",
+            "example": "AZ"
+          },
+          {
+            "title": "country",
+            "required": true,
+            "data_type": "string",
+            "description": "The country of the Card Applicant's address expressed by <a href='https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2'>ISO 3166-1 alpha-2</a>. This field is supported only for the U.S. market.",
+            "example": "US"
+          },
+          {
+            "title": "postalCode",
+            "required": true,
+            "data_type": "string",
+            "description": "The Card Applicant's Postal Code or ZIP Code.",
+            "example": "12345"
+          }
+        ]
+      },
+      "dateOfBirth": {
+        "title": "dateOfBirth",
+        "data_type": "string",
+        "description": "The Card Applicant's date of birth in <samp>YYYY-MM-DD</samp> format.",
+        "example": "1999-05-24"
+      },
+      "email": {
+        "title": "email",
+        "titleDescription": "An array of Card Applicant email addresses. This array currently supports only one email address per Card Applicant.",
+        "data_type": "array of objects",
+        "required": true,
+        "children": [
+          {
+            "title": "type",
+            "required": true,
+            "data_type": "string",
+            "description": "A type of email address. This field currently supports only <samp>WORK</samp>.",
+            "example": "WORK",
+            "enum": [
+              "WORK"
+            ]
+          },
+          {
+            "title": "address",
+            "required": true,
+            "data_type": "string",
+            "description": "The Card Applicant's email address.",
+            "example": "someone@example.com"
+          }
+        ]
+      },
+      "applications": {
+        "title": "applications",
+        "data_type": "array of objects",
+        "description": "An array of application objects. This array currently supports only one application.",
+        "required": true,
+        "children": [
+          {
+            "$ref": "#/components/schemas/applicant"
+          },
+          {
+            "title": "isRushCard",
+            "required": true,
+            "description": "A boolean flag indicating the preference to receive the physical Card with rush delivery. Your company may incur additional charges if this option is selected upon application submission.",
+            "data_type": "boolean"
+          },
+          {
+            "$ref": "#/components/schemas/account"
+          },
+          {
+            "$ref": "#/components/schemas/product"
+          },
+          {
+            "$ref": "#/components/schemas/company"
+          },
+          {
+            "$ref": "#/components/schemas/formEdits"
+          }
+        ]
+      },
+      "cards": {
+        "title": "cards",
+        "data_type": "array of objects",
+        "required": true,
+        "description": "An array of Card objects. This array can only have one Card object per request.",
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "accountNumber",
+                "validation": "15 characters",
+                "required": true,
+                "data_type": "string",
+                "description": "A 15-digit unique American Express Card Account Number.",
+                "example": "374200000000004"
+              }
+            ]
+          },
+          {
+            "title": "status",
+            "required": true,
+            "data_type": "string",
+            "description": "The new status of the Card. This field currently supports <samp>CANCELED</samp> with additional statuses coming soon.",
+            "example": "CANCELED",
+            "enum": [
+              "CANCELED"
+            ]
+          },
+          {
+            "title": "statusEffectiveDate",
+            "data_type": "string",
+            "description": "Effective date in UTC of the new status in <samp>YYYY-MM-DD</samp> format. This date can be up to six months in the future. If this field is missing, null, or in the past, American Express will consider the <samp>statusEffectiveDate</samp> as the current UTC date.",
+            "example": "2022-02-01"
+          },
+          {
+            "title": "statusChangeReason",
+            "required": true,
+            "data_type": "string",
+            "description": "The reason for the status change. This field is required for status changes where <samp>status</samp> is <samp>CANCELED</samp>. <samp>CARD_IS_NOT_NECESSARY</samp> and <samp>EMPLOYEE_DISCONNECTED_FROM_COMPANY</samp> are only valid in the Mexico market. <samp>DECEASED</samp> is not valid in the India market.",
+            "example": "LEFT_COMPANY",
+            "enum": [
+              "NO_LONGER_NEEDED",
+              " DECEASED",
+              " LEFT_COMPANY",
+              " CARD_IS_NOT_NECESSARY",
+              " EMPLOYEE_DISCONNECTED_FROM_COMPANY"
+            ]
+          }
+        ]
+      },
+      "cardsID": {
+        "title": "cards",
+        "data_type": "array of objects",
+        "required": true,
+        "description": "An array of Card objects. This array can only have one Card object per request.",
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "member",
+                "required": true,
+                "data_type": "object",
+                "description": "An object referencing information about a Corporate Card Member.",
+                "children": [
+                  {
+                    "title": "employeeId",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                    "example": "591249124"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "status",
+            "required": true,
+            "data_type": "string",
+            "description": "The new status of the Card. This field currently supports <samp>CANCELED</samp> with additional statuses coming soon.",
+            "example": "CANCELED",
+            "enum": [
+              "CANCELED"
+            ]
+          },
+          {
+            "title": "statusEffectiveDate",
+            "data_type": "string",
+            "description": "Effective date in UTC of the new status in <samp>YYYY-MM-DD</samp> format. This date can be up to six months in the future. If this field is missing, null, or in the past, American Express will consider the <samp>statusEffectiveDate</samp> as the current UTC date.",
+            "example": "2022-02-01"
+          },
+          {
+            "title": "statusChangeReason",
+            "required": true,
+            "data_type": "string",
+            "description": "The reason for the status change. This field is required for status changes where <samp>status</samp> is <samp>CANCELED</samp>. <samp>CARD_IS_NOT_NECESSARY</samp> and <samp>EMPLOYEE_DISCONNECTED_FROM_COMPANY</samp> are only valid in the Mexico market. <samp>DECEASED</samp> is not valid in the India market.",
+            "example": "LEFT_COMPANY",
+            "enum": [
+              "NO_LONGER_NEEDED",
+              " DECEASED",
+              " LEFT_COMPANY",
+              " CARD_IS_NOT_NECESSARY",
+              " EMPLOYEE_DISCONNECTED_FROM_COMPANY"
+            ]
+          }
+        ]
+      },
+      "searchParameters": {
+        "title": "searchParameters",
+        "required": true,
+        "data_type": "object",
+        "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+        "children": [
+          {
+            "title": "accountNumber",
+            "validation": "15 characters",
+            "required": true,
+            "data_type": "string",
+            "description": "A 15-digit unique American Express Card Account Number.",
+            "example": "374200000000004"
+          }
+        ]
+      },
+      "searchParametersEmployee": {
+        "title": "searchParametersEmployee",
+        "required": true,
+        "data_type": "object",
+        "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+        "children": [
+          {
+            "title": "member",
+            "required": true,
+            "data_type": "object",
+            "description": "An object referencing information about a Corporate Card Member.",
+            "children": [
+              {
+                "title": "employeeId",
+                "required": true,
+                "data_type": "string",
+                "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                "example": "591249124"
+              }
+            ]
+          }
+        ]
+      },
+      "searchParametersApplicationId": {
+        "title": "searchParametersApplicationId",
+        "data_type": "object",
+        "required": true,
+        "description": "A search query used to retrieve the details of a Global Apply for Card (GAFC) Corporate Card Application.",
+        "children": [
+          {
+            "title": "applicationId",
+            "required": true,
+            "data_type": "string",
+            "description": "The ID associated with the Global Apply for Card (GAFC) Corporate Card Application.",
+            "example": "US-1JEYV37SNNCK"
+          }
+        ]
+      },
+      "accountingInformationParameters": {
+        "title": "accountingInformationParameters",
+        "required": true,
+        "data_type": "object",
+        "description": "The accounting information of the Card Member. If this object is included, at least one of the fields below must be provided.",
+        "children": [
+          {
+            "title": "employeeId",
+            "required": false,
+            "data_type": "string",
+            "validation": "&le;10 characters",
+            "description": "A unique identifier assigned by the American Express Client.",
+            "example": "2322199833"
+          },
+          {
+            "title": "costCenter",
+            "required": false,
+            "data_type": "string",
+            "validation": "&le;10 characters",
+            "description": "A unique identifier assigned by the American Express Client to a Client Cost Center.",
+            "example": "7376323042"
+          },
+          {
+            "title": "universalId",
+            "required": false,
+            "data_type": "string",
+            "validation": "&le;25 characters",
+            "description": "A unique identifier assigned by the American Express Client driven by the Basic Control Account.",
+            "example": "7376323042"
+          }
+        ]
+      },
+      "memberAddress": {
+        "title": "address",
+        "data_type": "array of objects",
+        "required": true,
+        "description": "An array of a Corporate Card Member's addresses. This array currently supports only one address.",
+        "children": [
+          {
+            "title": "type",
+            "data_type": "string",
+            "required": true,
+            "description": "The type of address associated with the Card Member. This field currently supports <samp>BILLING</samp> addresses.",
+            "example": "BILLING",
+            "enum": [
+              "BILLING"
+            ]
+          },
+          {
+            "title": "line1",
+            "data_type": "string",
+            "validation": "&le;40 characters",
+            "required": true,
+            "description": "The first line of the Card Member's address.",
+            "example": "100 Elm Street"
+          },
+          {
+            "title": "line2",
+            "data_type": "string",
+            "validation": "&le;40 characters",
+            "required": false,
+            "description": "The second line of the Card Member's address.",
+            "example": "Suite A"
+          },
+          {
+            "title": "city",
+            "data_type": "string",
+            "validation": "&le;18 characters",
+            "required": true,
+            "description": "The city of the Card Member's address.",
+            "example": "Phoenix"
+          },
+          {
+            "title": "state",
+            "data_type": "string",
+            "required": true,
+            "description": "The state or region of the Card Member's address expressed by <a href='https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2'>ISO 3166-1 alpha-2</a>. This field is not valid for country codes other than <samp>US</samp> or <samp>CA</samp>.",
+            "example": "US-NY"
+          },
+          {
+            "title": "postalCode",
+            "data_type": "string",
+            "required": true,
+            "description": "The Card Member's Postal Code or ZIP Code.",
+            "example": "12345"
+          },
+          {
+            "title": "country",
+            "data_type": "string",
+            "required": true,
+            "description": "The country of the Card Member's address expressed by <a href='https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2'>ISO 3166-1 alpha-2</a>. For U.S. market cards, country must be <samp>US</samp>. For Canada market cards, country must be <samp>CA</samp> or <samp>US</samp>.",
+            "example": "US"
+          }
+        ]
+      },
+      "updateStatusResponse_200": {
+        "title": "updateStatusResponse_200",
+        "titleDescription": "Successful response.",
+        "data_type": "array of objects",
+        "required": true,
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "accountNumber",
+                "validation": "15 characters",
+                "required": true,
+                "data_type": "string",
+                "description": "A 15-digit unique American Express Card Account Number.",
+                "example": "374200000000004"
+              }
+            ]
+          },
+          {
+            "title": "status",
+            "required": true,
+            "data_type": "string",
+            "description": "The new status of the Card. Successful immediate cancellations will return <samp>CANCELED</samp>. Successful future dated cancellations will return <samp>CANCELATION_SCHEDULED</samp>. Successful cancellation initiation requests in market [Austria, Hong Kong, Sweden, Denmark, Norway, IEC, and Argentina] will return <samp>CANCELATION_INITIATED</samp>.",
+            "example": "CANCELED",
+            "enum": [
+              "CANCELED",
+              " CANCELATION_SCHEDULED",
+              " CANCELATION_INITIATED"
+            ]
+          },
+          {
+            "$ref": "#/components/parameters/processId"
+          },
+          {
+            "$ref": "#/components/parameters/lastFive"
+          }
+        ]
+      },
+      "updateStatusResponse_200_ID": {
+        "title": "updateStatusResponse_200",
+        "titleDescription": "Successful response.",
+        "data_type": "array of objects",
+        "required": true,
+        "children": [
+          {
+            "title": "searchParameters",
+            "required": true,
+            "data_type": "object",
+            "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+            "children": [
+              {
+                "title": "member",
+                "required": true,
+                "data_type": "object",
+                "description": "An object referencing information about a Corporate Card Member.",
+                "children": [
+                  {
+                    "title": "employeeId",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                    "example": "591249124"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "status",
+            "required": true,
+            "data_type": "string",
+            "description": "The new status of the Card. Successful immediate cancellations will return <samp>CANCELED</samp>. Successful future dated cancellations will return <samp>CANCELATION_SCHEDULED</samp>. Successful cancellation initiation requests in market [Austria, Hong Kong, Sweden, Denmark, Norway, IEC, and Argentina] will return <samp>CANCELATION_INITIATED.</samp>",
+            "example": "CANCELED",
+            "enum": [
+              "CANCELED",
+              " CANCELATION_SCHEDULED",
+              " CANCELATION_INITIATED"
+            ]
+          },
+          {
+            "$ref": "#/components/parameters/processId_ID"
+          },
+          {
+            "$ref": "#/components/parameters/lastFive_ID"
+          }
+        ]
+      },
+      "updateStatusResponse_207": {
+        "title": "updateStatusResponse_207",
+        "titleDescription": "Multi-status operation",
+        "data_type": "object",
+        "required": true,
+        "children": [
+          {
+            "title": "cards",
+            "data_type": "array of objects",
+            "children": [
+              {
+                "title": "searchParameters",
+                "required": true,
+                "data_type": "object",
+                "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+                "children": [
+                  {
+                    "title": "accountNumber",
+                    "validation": "15 characters",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "A 15-digit unique American Express Card Account Number.",
+                    "example": "374200000000004"
+                  }
+                ]
+              },
+              {
+                "title": "status",
+                "required": true,
+                "data_type": "string",
+                "description": "The new status of the Card. This field currently supports <samp>CANCELED</samp> with additional statuses coming soon.",
+                "example": "CANCELED",
+                "enum": [
+                  "CANCELED"
+                ]
+              },
+              {
+                "$ref": "#/components/parameters/processId"
+              },
+              {
+                "$ref": "#/components/parameters/lastFive"
+              }
+            ]
+          },
+          {
+            "title": "errors",
+            "data_type": "array of objects",
+            "required": true,
+            "children": [
+              {
+                "title": "searchParameters",
+                "required": true,
+                "data_type": "object",
+                "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID."
+              },
+              {
+                "title": "code",
+                "data_type": "string",
+                "required": true,
+                "description": "A machine-readable field indicating the type of error.",
+                "example": "4200"
+              },
+              {
+                "title": "message",
+                "data_type": "string",
+                "required": true,
+                "description": "A string field that provides a short description of the error.",
+                "example": "Invalid request"
+              },
+              {
+                "title": "detail",
+                "data_type": "string",
+                "required": false,
+                "description": "A string field that provides a detailed description of the error.",
+                "example": "Invalid or missing value in: <samp>field name</samp>."
+              },
+              {
+                "title": "link",
+                "data_type": "string",
+                "description": "A link to more documentation about the error message.",
+                "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+              },
+              {
+                "$ref": "#/components/parameters/processId_Error"
+              }
+            ]
+          }
+        ]
+      },
+      "updateStatusResponse_207_ID": {
+        "title": "updateStatusResponse_207",
+        "titleDescription": "Multi-status operation",
+        "data_type": "object",
+        "required": true,
+        "children": [
+          {
+            "title": "cards",
+            "data_type": "array of objects",
+            "children": [
+              {
+                "title": "searchParameters",
+                "required": true,
+                "data_type": "object",
+                "description": "A search query used to reference an active American Express Corporate Card. Searches for cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+                "children": [
+                  {
+                    "title": "member",
+                    "required": true,
+                    "data_type": "object",
+                    "description": "An object referencing information about a Corporate Card Member.",
+                    "children": [
+                      {
+                        "title": "name",
+                        "required": true,
+                        "data_type": "object",
+                        "description": "The name of the Corporate Card Member.",
+                        "children": [
+                          {
+                            "title": "last",
+                            "required": true,
+                            "data_type": "string",
+                            "description": "The last name of the Corporate Card Member. Blank spaces at the end or beginning will be trimmed by this API.",
+                            "example": "Smith"
+                          }
+                        ]
+                      },
+                      {
+                        "title": "employeeId",
+                        "required": true,
+                        "data_type": "string",
+                        "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                        "example": "591249124"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "status",
+                "required": true,
+                "data_type": "string",
+                "description": "The new status of the Card. This field currently supports <samp>CANCELED</samp> with additional statuses coming soon.",
+                "example": "CANCELED",
+                "enum": [
+                  "CANCELED"
+                ]
+              },
+              {
+                "$ref": "#/components/parameters/processId_ID"
+              },
+              {
+                "$ref": "#/components/parameters/lastFive_ID"
+              }
+            ]
+          },
+          {
+            "title": "errors",
+            "data_type": "array of objects",
+            "children": [
+              {
+                "title": "searchParameters",
+                "required": true,
+                "data_type": "object",
+                "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID."
+              },
+              {
+                "title": "code",
+                "data_type": "string",
+                "required": true,
+                "description": "A machine-readable field indicating the type of error.",
+                "example": "4200"
+              },
+              {
+                "title": "message",
+                "data_type": "string",
+                "required": true,
+                "description": "A string field that provides a short description of the error.",
+                "example": "Invalid request"
+              },
+              {
+                "title": "detail",
+                "data_type": "string",
+                "required": false,
+                "description": "A string field that provides a detailed description of the error.",
+                "example": "Invalid or missing value in: <samp>field name</samp>."
+              },
+              {
+                "title": "link",
+                "data_type": "string",
+                "description": "A link to more documentation about the error message.",
+                "example": "https://developer.americanexpress.com/products/nextgen-at-work-apis/resources/errors"
+              },
+              {
+                "$ref": "#/components/parameters/processId_Error"
+              }
+            ]
+          }
+        ]
+      },
+      "applyCardResponse": {
+        "title": "applyCardResponse",
+        "data_type": "object",
+        "required": true,
+        "children": [
+          {
+            "title": "applicationId",
+            "data_type": "string",
+            "required": true,
+            "description": "An alphanumeric identifier for the new Card Application.",
+            "example": "US-7376323"
+			},
+          {
+            "title": "status",
+            "data_type": "string",
+            "required": true,
+            "description": "The status of the Card Application.",
+            "example": "APPLICATION_INITIATED"
+          }
+        ]
+      },
+      "searchParametersAddress_200": {
+        "title": "searchParametersAddress_200",
+        "data_type": "object",
+        "required": true,
+        "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+        "children": [
+          {
+            "title": "accountNumber",
+            "required": true,
+            "validation": "15 characters",
+            "description": "A 15-digit unique American Express Card Account Number.",
+            "example": "374200000000004"
+          }
+        ]
+      },
+      "searchParameters_200_AIC": {
+        "title": "searchParameters_200_AIC",
+        "data_type": "object",
+        "required": true,
+        "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+        "children": [
+          {
+            "title": "accountNumber",
+            "required": true,
+            "validation": "15 characters",
+            "description": "A 15-digit unique American Express Card Account Number.",
+            "example": "374200000000004"
+          }
+        ]
+      },
+      "searchParametersAddressEmployee_200_ID": {
+        "title": "searchParametersAddress_200_ID",
+        "data_type": "object",
+        "required": true,
+        "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+        "children": [
+          {
+            "title": "member",
+            "required": true,
+            "data_type": "object",
+            "description": "An object referencing information about a Corporate Card Member.",
+            "children": [
+              {
+                "title": "employeeId",
+                "required": true,
+                "data_type": "string",
+                "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                "example": "591249124"
+              }
+            ]
+          }
+        ]
+      },
+      "searchParametersAIC_200_ID": {
+        "title": "searchParametersAIC_200",
+        "data_type": "object",
+        "required": true,
+        "description": "A search query used to reference an active American Express Corporate Card. Searches for Cards can be conducted via the Card Account Number, or by using the Card Member's Employee ID.",
+        "children": [
+          {
+            "title": "member",
+            "required": true,
+            "data_type": "object",
+            "description": "An object referencing information about a Corporate Card Member.",
+            "children": [
+              {
+                "title": "name",
+                "required": true,
+                "data_type": "object",
+                "description": "The name of the Corporate Card Member.",
+                "children": [
+                  {
+                    "title": "last",
+                    "required": true,
+                    "data_type": "string",
+                    "description": "The last name of the Corporate Card Member. Blank spaces at the end or beginning will be trimmed by this API.",
+                    "example": "Smith"
+                  }
+                ]
+              },
+              {
+                "title": "employeeId",
+                "required": true,
+                "data_type": "string",
+                "description": "A unique identifier assigned by the American Express Client. Blank spaces at the end or beginning will be trimmed by this API.",
+                "example": "591249124"
+              }
+            ]
+          }
+        ]
+      },
+      "billingAddressStatus_200": {
+        "title": "status",
+        "data_type": "string",
+        "required": true,
+        "description": "The status of the demographic update transaction. Successful update transactions will return <samp>SUCCESS</samp>.",
+        "example": "SUCCESS",
+        "enum": [
+          "SUCCESS"
+        ]
+      },
+      "accountingInformationStatus_200": {
+        "title": "status",
+        "data_type": "string",
+        "required": true,
+        "description": "The status of this transaction. Successful update transactions will return <samp>SUCCESS</samp>.",
+        "example": "SUCCESS",
+        "enum": [
+          "SUCCESS"
+        ]
+      },
+      "getApplicationDetailsCreatedOn_200": {
+        "title": "createdOn",
+        "validation": "&le;10 characters",
+        "required": true,
+        "data_type": "string",
+        "description": "The date when the Corporate Card Application was initiated. The format is: <samp>YYYY-MM-DD</samp>.",
+        "example": "2024-06-21"
+      },
+      "getApplicationDetailsSubmittedOn_200": {
+        "title": "submittedOn",
+        "validation": "&le;10 characters",
+        "required": true,
+        "data_type": "string",
+        "description": "The date when the Corporate Card Application was submitted by the Card Applicant. The format is: <samp>YYYY-MM-DD</samp>.",
+        "example": "2024-06-05"
+      },
+      "getApplicationDetailsTransactionStatus_200": {
+        "title": "transactionStatus",
+        "data_type": "string",
+        "required": true,
+        "description": "The status of the Corporate Card Application. Possible values include:<ul class='pad-3-l'><li><samp>APPROVED_BY_AMEX</samp> - The Card Application has been approved by American Express.</li><li><samp>CANCELLED_BY_AMEX</samp> - The Card Application has been canceled or denied by American Express.</li><li><samp>APPLICATION_EXPIRED</samp> - The Card Application has exceeded the maximum days allowed to be pending and is no longer serviceable.</li><li><samp>SUBMITTED_TO_AMEX</samp> - The Card Application has successfully been sent to American Express for processing. Applications in <samp>Japan</samp> and <samp>Italy</samp> markets will remain in this status after the Card Applicant submits the Card Application.</li><li><samp>PENDING_INFO_GATHERING_BY_AMEX</samp> - American Express has reached out to the Applicant for additional information.</li><li><samp>PENDING_WITH_APPLICANT</samp> - The Card Application has not yet been submitted by the Applicant.</li><li><samp>CANCELLED_BY_COMPANY</samp> - A Program Administrator (PA) has canceled the Card Application.</li><li><samp>PENDING_APPLICANT_SIGNATURE</samp> and <samp>PENDING_PA_SIGNATURE</samp> - The Card Application is awaiting a digital signature from the Applicant or the PA, respectively. Signature statuses are only applicable for <samp>Italy</samp> market Card Applications.</li><li><samp>PENDING_WITH_COMPANY</samp> - The Card Application is waiting for an approval from a PA.</li> </ul>",
+        "example": "APPROVED_BY_AMEX",
+        "enum": [
+          " APPROVED_BY_AMEX",
+          " CANCELLED_BY_AMEX",
+          " APPLICATION_EXPIRED",
+          " SUBMITTED_TO_AMEX",
+          " PENDING_WITH_APPLICANT",
+          " CANCELLED_BY_COMPANY",
+          " PENDING_INFO_GATHERING_BY_AMEX",
+          " PENDING_WITH_COMPANY",
+          " PENDING_PA_SIGNATURE",
+          " PENDING_APPLICANT_SIGNATURE"
+        ]
+      },
+      "getApplicationDetailsMarket_200": {
+        "title": "market",
+        "validation": "&le;three characters",
+        "data_type": "string",
+        "required": true,
+        "description": "The market where the Corporate Card Application was initiated.",
+        "example": "US",
+        "enum": [
+          "US",
+          " GDC",
+          " MX",
+          " IEC",
+          " JP",
+          " SG",
+          " IN",
+          " DE",
+          " IT",
+          " GB"
+        ]
+      },
+      "billingAddressProcessId_200": {
+        "title": "processId",
+        "data_type": "string",
+        "required": true,
+        "description": "The @ Work tracking ID for the transaction. You can use this tracking ID to search for this operation on the @ Work Status Tracking page. If mocking has been enabled for your Sandbox environment and there is an error downstream, this field will be <samp>1234567</samp>.",
+        "example": "1234567"
+      },
+      "accountingInformationProcessId_200": {
+        "title": "processId",
+        "data_type": "string",
+        "required": true,
+        "description": "The @ Work tracking ID for the transaction. You can use this tracking ID to search for this operation on the @ Work Status Tracking page. If mocking has been enabled for your Sandbox environment and there is an error downstream, this field will be <samp>1234567</samp>.",
+        "example": "1234567"
+      },
+      "product": {
+        "title": "product",
+        "description": "An object containing details about the Card product for this application.",
+        "data_type": "object",
+        "required": true,
+        "children": [
+          {
+            "title": "type",
+            "validation": "&le;10 characters",
+            "data_type": "string",
+            "required": true,
+            "description": "The American Express Product type for the Card.",
+            "example": "GREEN",
+            "enum": [
+              "GREEN",
+              " BASIC_GREEN",
+              " DEFAULT_GREEN",
+              " PERSONAL_GREEN",
+              " GOLD",
+              " EXECUTIVE_GOLD",
+              " DEFAULT_GOLD",
+              " PLATINUM",
+              " PLUS",
+              " JAPAN_RAIL_CARD_GREEN",
+              " JAPAN_RAIL_CARD_GOLD",
+              " JAPAN_RAIL_CARD_PLATINUM",
+              " DEFAULT_PLATINUM",
+              " NO_PLASTIC"
+            ]
+          }
+        ]
+      },
+      "formEdits": {
+        "title": "formEdits",
+        "data_type": "array of objects",
+        "required": false,
+        "description": "An array of objects indicating whether the form can be edited, based on the specified configuration. By default, the form is editable.",
+        "children": [
+          {
+            "title": "fieldName",
+            "required": false,
+            "data_type": "string",
+            "description": "The name of the field that can be edited. The editable fields are: <samp>accountingInformation.employeeId</samp>, <samp>accountingInformation.costCenter</samp>, <samp>accountingInformation.universalId</samp>.",
+            "example": "accountingInformation.employeeId"
+          },
+          {
+            "title": "isEditable",
+            "required": false,
+            "data_type": "boolean",
+            "description": "A flag indicating whether the field is editable.",
+            "example": "TRUE",
+            "enum": [
+              "TRUE",
+              " FALSE"
+            ]
+          }
+        ]
+      }
+    },
+    "parameters": {
+      "Request-Id": {
+        "title": "Request-Id",
+        "in": "header",
+        "description": "A unique identifier for the API request. American Express advises using a Version 4 UUID or similar random string that has enough entropy to prevent clashes.",
+        "required": true,
+        "data_type": "string",
+        "example": "00000000-cfe6-495d-98cc-7fb1be768a3d"
+      },
+      "clientId": {
+        "title": "Client-Id",
+        "in": "header",
+        "description": "A unique key assigned by American Express to the API consumer for identification.",
+        "required": true,
+        "data_type": "string",
+        "example": "00000000-cfe6-495d-98cc-7fb1be768a3d"
+      },
+      "idempotencyKey": {
+        "title": "Idempotency-Key",
+        "in": "header",
+        "description": "A unique string, generated by the Client, that American Express supports to protect against repeated API calls that can have negative consequences. The server uses this key to recognize multiple attempts of the same request. When the API retries due to failure, the key should be reused to indicate that the same request is being sent. The key should be stored for 24 hours in case of failures. American Express requires a Version 4 UUID or similar random string that has enough entropy to prevent clashes.",
+        "required": true,
+        "data_type": "string",
+        "example": "00000000-cfe6-495d-98cc-7fb1be768a3d"
+      },
+      "authorization": {
+        "title": "Authorization",
+        "in": "header",
+        "description": "An OAuth2 Bearer token that consumers use to gain access to the American Express API. The value passed here is the response of Access Token API. See the Authorization section for more details.",
+        "required": true,
+        "data_type": "string",
+        "example": "TBD"
+      },
+      "date": {
+        "title": "Date",
+        "in": "header",
+        "description": "The UTC system date and time at the time of response.",
+        "required": true,
+        "data_type": "string",
+        "example": "2024-02-05"
+      },
+      "processId": {
+        "title": "processId",
+        "required": true,
+        "data_type": "string",
+        "description": "The @ Work tracking ID for the transaction. You can use this tracking ID to search for this status update operation on the @ Work Status Tracking page. If mocking has been enabled for your Sandbox environment and there is an error downstream, this field will be <samp>1234567</samp>.",
+        "example": "1234567"
+      },
+      "lastFive": {
+        "title": "lastFive",
+        "required": true,
+        "data_type": "string",
+        "description": "The last five digits of the Card Account Number being updated.",
+        "example": "12345"
+      },
+      "processId_ID": {
+        "title": "processId",
+        "required": true,
+        "data_type": "string",
+        "description": "The @ Work tracking ID for the transaction. You can use this tracking ID to search for this status update operation on the @ Work Status Tracking page. If mocking has been enabled for your Sandbox environment and there is an error downstream, this field will be <samp>1234567</samp>.",
+        "example": "1234567"
+      },
+      "lastFive_ID": {
+        "title": "lastFive",
+        "required": true,
+        "data_type": "string",
+        "description": "The last five digits of the Card Account Number being updated. If mocking has been enabled for your Sandbox environment and there is an error downstream, this field will be <samp>99999</samp>",
+        "example": "12345"
+      },
+      "processId_Error": {
+        "title": "processId",
+        "data_type": "string",
+        "description": "The @ Work tracking ID for the transaction. You can use this tracking ID to search for this status update operation on the @ Work Status Tracking page. This field will not be present if no tracking ID is generated for the transaction.",
+        "example": "1234567"
+      },
+      "processID_ErrorAddress": {
+        "title": "processId",
+        "data_type": "string",
+        "description": "The @ Work tracking ID for the transaction. You can use this tracking ID to search for this operation on the @ Work Status Tracking page. This field will not be present if no tracking ID is generated for the transaction.",
+        "example": "1234567"
+      },
+      "processID_AccountingInformation": {
+        "title": "processId",
+        "data_type": "string",
+        "description": "The @ Work tracking ID for the transaction. You can use this tracking ID to search for this operation on the @ Work Status Tracking page. This field will not be present if no tracking ID is generated for the transaction.",
+        "example": "1234567"
+      }
+    }
   }
 }
