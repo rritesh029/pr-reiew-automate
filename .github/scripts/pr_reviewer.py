@@ -1803,6 +1803,7 @@ class ContentReviewBot:
         self.gh = Github(base_url=config.api_url, auth=Auth.Token(config.token))
         print("GitHub Client (self.gh):", self.gh)
         print("GitHub API URL:", config.api_url)
+        print("GitHub API URL:", config.server_url)
         self.repo = self.gh.get_repo(config.repository)
         self.scanner = scanner
 
